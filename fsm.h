@@ -3,6 +3,9 @@
 #include "Arduino.h"
 #include "light.h"
 #include "Constants.h"
+#include "speaker.h"
+#include "sensor.h"
+#include "diffuser.h"
 
 class Fsm {
   public:
@@ -18,9 +21,17 @@ class Fsm {
     void meditationFlowCheckSetUp();
     void meditationFlowCheckState();
 
+    void meditationSetUp();
+    void meditationState();
+
+    void endSetUp();
+    void endState();
+
   private:
     Light light;
     Sensor sensor;
+    Speaker speaker;
+    Diffuser diffuser;
 
     //State management
     bool idle = true;
@@ -32,6 +43,12 @@ class Fsm {
     //cabinLightsOn
     bool cabinLightOn = false;
     unsigned long cabinLightOnStartTime;
+
+    // meditation
+    bool meditation = false;
+
+    // end
+    bool end = false;
 
 };
 #endif

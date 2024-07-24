@@ -5,8 +5,12 @@
 class Light {
   public:
     void idleLighting();
-    void cabinLightOn();
+    void cabinLighting();
+    void meditationFlowCheckLighting();
 
+    void meditationLighting();
+
+    void endLighting();
   private:
 };
 #endif

@@ -8,7 +8,11 @@ class Sensor {
 
     bool chairPressureDetected(int time);
 
-    bool heartBeatDetected();
+    bool chairPressureNotDetected(int time);
+
+    bool heartBeatDetected(int time);
+
+    bool heartBeatNotDetected(int time);
 
     int getHeartBeat();
   private:

@@ -1,9 +1,11 @@
 #include "fsm.h"
 
 void Fsm::resetStates() {
-   bool idle = false;
-   bool meditationFlowCheck = false;
-   bool cabinLightOn = false;
+  idle = false;
+  meditationFlowCheck = false;
+  cabinLightOn = false;
+  meditation = false;
+  end = false;
 }
 
 
@@ -11,9 +13,8 @@ void Fsm::resetStates() {
 
 
 void Fsm::idleSetUp() {
-   bool idle = true;
-   bool meditationFlowCheck = false;
-   bool cabinLightOn = false;
+  resetStates();
+  idle = true;
 }
 
 void Fsm::idleState() {
@@ -32,16 +33,6 @@ void Fsm::idleState() {
 
 
 
-void Fsm::meditationFlowCheckSetUp() {
-  resetStates();
-  meditationFlowCheck = true;
-}
-
-void Fsm::meditationFlowCheckState() {
-  continue;
-}
-
-
 
 
 
@@ -54,7 +45,7 @@ void Fsm::cabinLightOnSetUp() {
 // cabinLightOnState
 void Fsm::cabinLightOnState() {
   // cabinLightOn Lighting
-  light.cabinLightOn();
+  light.cabinLighting();
 
   int seconds = (cabinLightOnStartTime - currTime) / SECOND;
 
@@ -75,6 +66,71 @@ void Fsm::cabinLightOnState() {
 
 
 
+void Fsm::meditationFlowCheckSetUp() {
+  resetStates();
+  meditationFlowCheck = true;
+}
+
+void Fsm::meditationFlowCheckState() {
+  light.meditationFlowCheckLighting();
+
+
+  if(sensor.chairPressureNotDetected(CHAIRNOTDETECTTIME)) {
+    // if no pressure on chair, go to cabin light on as user not meditating.
+    cabinLightOnSetUp();
+  }
+  else if(sensor.heartBeatDetected(HEARTBEATDETECTTIME)) {
+    // if heartbeat detected for some time, go to meditation state
+    meditationSetUp();
+  }
+}
+
+
+
+
+void Fsm::meditationSetUp() {
+  resetStates();
+  speaker.speakerReset();
+  meditation = true;
+}
+
+
+void Fsm::meditationState() {
+  // state with ligting system
+  light.meditationLighting();
+  speaker.meditationSpeaker();
+  diffuser.meditationDiffuser();
+
+  if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
+    cabinLightOnSetUp();
+  }
+  else if(speaker.getLoopedTimes() == (SPEAKERLOOPCOUNTMINUSONE)) {
+    endStateSetUp();
+  }
+}
+
+
+
+
+void Fsm::endSetUp() {
+  resetStates();
+  end = true;
+}
+
+
+void Fsm::endState() {
+  light.endLighting();
+  speaker.endStateSpeaker();
+
+  if(speaker.getLoopedTimes() == SPEAKERLOOPCOUNT && sensor.chairPressureNotDetected(ENDNOPRESSURE)) {
+    cabinLightOnSetUp();
+  } 
+  else if(sensor.chairPressureDetected(ENDPRESSUREDETECTED)) {
+    meditationFlowCheckState();
+  }
+}
+
+
 
 
 // main loop
@@ -89,6 +145,9 @@ void Fsm::mainloop() {
   }
   else if(meditationFlowCheck) {
     meditationFlowCheckState();
+  }
+  else if(meditation()) {
+    meditation();
   }
 
 }
