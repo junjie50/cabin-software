@@ -9,6 +9,7 @@
 
 class Fsm {
   public:
+    void setup();
     void mainloop();
     void resetStates();
 
@@ -23,9 +24,11 @@ class Fsm {
 
     void meditationSetUp();
     void meditationState();
+    void meditationExit();
 
     void endSetUp();
     void endState();
+    void endExit();
 
   private:
     Light light;
@@ -46,6 +49,9 @@ class Fsm {
 
     // meditation
     bool meditation = false;
+    bool fidget = false;
+    unsigned long fidgetStartTime;
+    bool heartbeat = true;
 
     // end
     bool end = false;

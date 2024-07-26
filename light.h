@@ -9,6 +9,7 @@ class Light {
     void meditationFlowCheckLighting();
 
     void meditationLighting();
+    void meditationNoHBLighting();
 
     void endLighting();
   private:

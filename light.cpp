@@ -5,5 +5,5 @@ void Light::idleLighting();
 
 
 // cabin lights turn on
-void Light::cabinLightOn();
+void Light::cabinLighting();
 

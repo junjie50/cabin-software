@@ -8,10 +8,7 @@ void Fsm::resetStates() {
   end = false;
 }
 
-
-
-
-
+// IDLE STATE
 void Fsm::idleSetUp() {
   resetStates();
   idle = true;
@@ -21,15 +18,13 @@ void Fsm::idleState() {
   // idle state lighting system
   light.idleLighting();
   
-  if(sensor.cabinMotionDeteceted()) {
+  if(sensor.cabinMotionDetected()) {
     cabinLightOnSetUp();
   }
   else if(sensor.chairPressureDetected(CHAIRDETECTTIME)) {
     meditationFlowCheckSetUp();
   }
 }
-
-
 
 
 
@@ -74,7 +69,6 @@ void Fsm::meditationFlowCheckSetUp() {
 void Fsm::meditationFlowCheckState() {
   light.meditationFlowCheckLighting();
 
-
   if(sensor.chairPressureNotDetected(CHAIRNOTDETECTTIME)) {
     // if no pressure on chair, go to cabin light on as user not meditating.
     cabinLightOnSetUp();
@@ -91,21 +85,71 @@ void Fsm::meditationFlowCheckState() {
 void Fsm::meditationSetUp() {
   resetStates();
   speaker.speakerReset();
+  diffuser.start();
   meditation = true;
+  fidget = false;
+  heartbeat = true;
 }
+
+void Fsm::meditationExit() {
+  speaker.speaker2Stop();
+  speaker.speaker1Stop();
+  diffuser.stop();
+}
+
 
 
 void Fsm::meditationState() {
   // state with ligting system
-  light.meditationLighting();
+  if(!heartbeat) {
+    light.meditationNoHBLighting(); // average human hb
+    // buzz
+    // control like static soft pink
+  }
+  else {
+    light.meditationLighting();
+  }
+
+  // additional speaker
+  if(fidget){
+    speaker.fidgetStateSpeaker();
+  }
+  else {
+    speaker.speaker2Stop(); 
+  }
+
   speaker.meditationSpeaker();
-  diffuser.meditationDiffuser();
 
   if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
+    meditationExit();
     cabinLightOnSetUp();
   }
-  else if(speaker.getLoopedTimes() == (SPEAKERLOOPCOUNTMINUSONE)) {
-    endStateSetUp();
+  else if(speaker.getLoopedTimes() == SPEAKERLOOPCOUNTMINUSONE) {
+    meditationExit();
+    endSetUp();
+  }
+  else {
+    // heart beat check and change state
+    if(sensor.heartBeatNotDetected(CHAIRDETECTTIME) && sensor.chairPressureDetected(CHAIRDETECTTIME)){
+      // buzz
+      heartbeat = false;
+    }
+    else{
+      heartbeat = true;
+    }
+
+    // fidget check and change state
+    if(!fidget) {
+      if(sensor.fidgetDetected(FIDGETDETECTTIME)) {
+        fidget = true;
+        fidgetStartTime = currTime;
+      }
+    }
+    else if ((currTime - fidgetStartTime) / SECOND > 5){ // no fidget for more than 5 seconds
+      if(!sensor.fidgetDetected(FIDGETDETECTTIME)) {
+        fidget = false;
+      }
+    }
   }
 }
 
@@ -118,24 +162,38 @@ void Fsm::endSetUp() {
 }
 
 
+void Fsm::endExit() {
+  speaker.speaker1Stop();
+  speaker.speaker2Stop();
+}
+
+
 void Fsm::endState() {
   light.endLighting();
   speaker.endStateSpeaker();
 
   if(speaker.getLoopedTimes() == SPEAKERLOOPCOUNT && sensor.chairPressureNotDetected(ENDNOPRESSURE)) {
+    endExit();
     cabinLightOnSetUp();
   } 
   else if(sensor.chairPressureDetected(ENDPRESSUREDETECTED)) {
+    endExit();
     meditationFlowCheckState();
   }
 }
 
 
+// main loop
+void Fsm::setup() {
+  speaker.speakerSetUP(); // set up speaker serial and everything
+}
 
 
 // main loop
 void Fsm::mainloop() {
   currTime = millis();
+  // sensor collect data every second and update
+  sensor.polling();
 
   if(idle) {
     idleState();
@@ -146,8 +204,8 @@ void Fsm::mainloop() {
   else if(meditationFlowCheck) {
     meditationFlowCheckState();
   }
-  else if(meditation()) {
-    meditation();
+  else if(meditation) {
+    meditationState();
   }
 
 }
