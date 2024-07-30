@@ -1,7 +1,6 @@
 #ifndef speakerClass_h
 #define speakerClass_h
 #include <DFRobot_DF1201S.h>
-#include "SoftwareSerial.h"
 #include "Constants.h"
 //DFPlayer Pro
 class Speaker {

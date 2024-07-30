@@ -2,10 +2,14 @@
 #define sensorClass_h
 #include "Arduino.h"
 #include "Constants.h"
+#include "DFRobot_Heartrate.h"
+#include "orb.h"
 
 class Sensor {
   public:
-    void polling();
+    void setup();
+
+    void polling(Orb orb);
 
     bool cabinMotionDetected();
 
@@ -23,17 +27,28 @@ class Sensor {
 
 
 
-
     bool chairPressureHigh();
+
     bool heartBeatHigh();
+
     bool fidgetHigh();
 
+
   private:
+    // Record our own heartbeat as it is tracked by another processor
+    // Every second Serial comms to send the data
+    int heartBeat = 0; 
+    bool fidget = false; 
+
+
+    // duration tracker for state change
     int chairPressureTime = 0;
     int chairNoPressureTime = 0;
     int heartBeatTime = 0;
     int noHeartBeatTime = 0;
     int fidgetTime = 0;
-    unsigned long prevTime = 0;
+
+    // buffer for message
+    char bufIn[15];
 };
 #endif

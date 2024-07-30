@@ -27,10 +27,6 @@ void Fsm::idleState() {
 }
 
 
-
-
-
-
 void Fsm::cabinLightOnSetUp() {
   resetStates();
   cabinLightOn = true;
@@ -61,13 +57,18 @@ void Fsm::cabinLightOnState() {
 
 
 
+
+
+
+
 void Fsm::meditationFlowCheckSetUp() {
   resetStates();
+  light.meditationFlowCheckLighting(true);
   meditationFlowCheck = true;
 }
 
 void Fsm::meditationFlowCheckState() {
-  light.meditationFlowCheckLighting();
+  light.meditationFlowCheckLighting(false);
 
   if(sensor.chairPressureNotDetected(CHAIRNOTDETECTTIME)) {
     // if no pressure on chair, go to cabin light on as user not meditating.
@@ -78,6 +79,10 @@ void Fsm::meditationFlowCheckState() {
     meditationSetUp();
   }
 }
+
+
+
+
 
 
 
@@ -96,8 +101,6 @@ void Fsm::meditationExit() {
   speaker.speaker1Stop();
   diffuser.stop();
 }
-
-
 
 void Fsm::meditationState() {
   // state with ligting system
@@ -156,6 +159,11 @@ void Fsm::meditationState() {
 
 
 
+
+
+
+
+
 void Fsm::endSetUp() {
   resetStates();
   end = true;
@@ -183,17 +191,30 @@ void Fsm::endState() {
 }
 
 
+
+
+
+
+
+
+
+
 // main loop
 void Fsm::setup() {
+  orb.setup(); //setup bluetooth comms with orb
+  sensor.setup();
   speaker.speakerSetUP(); // set up speaker serial and everything
+  idleSetUp();
 }
 
 
 // main loop
 void Fsm::mainloop() {
   currTime = millis();
-  // sensor collect data every second and update
-  sensor.polling();
+  // sensor collect data every second and 
+  // updates include those from orb if orb has sent hb and fidget
+  sensor.polling(orb);
+ 
 
   if(idle) {
     idleState();

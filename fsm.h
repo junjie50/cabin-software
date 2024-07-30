@@ -6,6 +6,7 @@
 #include "speaker.h"
 #include "sensor.h"
 #include "diffuser.h"
+#include "orb.h"
 
 class Fsm {
   public:
@@ -35,6 +36,7 @@ class Fsm {
     Sensor sensor;
     Speaker speaker;
     Diffuser diffuser;
+    Orb orb;
 
     //State management
     bool idle = true;
