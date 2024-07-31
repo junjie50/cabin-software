@@ -2,6 +2,8 @@
 
 // Each section lights up by turn and dimming
 void Light::idleLighting() {
+  static unsigned long idleLightInterval = 2000;
+  static unsigned long idleLightIntervalHalf = 1000;
   static unsigned long time = millis();
   static unsigned long prevRemainder = 0;
   time = millis();
@@ -36,6 +38,7 @@ void Light::meditationFlowCheckLighting(bool start) {
   time = millis();
   unsigned long remainder = (time - startTime);
   int power = (interval - remainder) / SECOND * MAXLIGHT;
+
   if(power < LOWLIGHT) {
     lightAll(LOWLIGHT);
   }
@@ -44,13 +47,76 @@ void Light::meditationFlowCheckLighting(bool start) {
   }
 }
 
+void Light::meditationLighting(int heartbeat) {
+  static unsigned long time = millis();
+  static unsigned minute = 60000;
+  static unsigned int interval;
+  if(heartbeat == 0) {
+    heartbeat = AVGHEARTBEAT;
+  }
+
+  interval = minute / heartbeat;
+  unsigned long half = interval / 2;
+  time = millis();
+  unsigned long remainder = time % interval;
+  if(remainder > half) {
+    remainder = (interval - remainder);
+  }
+
+  lightAll(remainder / SECOND * MAXLIGHT);
+}
+
+void Light::endLighting() {
+  static unsigned long endLightInterval = 1000;
+  static unsigned long time;
+  static unsigned long prevRemainder = 0;
+
+  time = millis();
+  int currRemainder = time % endLightInterval;
+
+  if(prevRemainder > currRemainder) {
+    idleLight = (idleLight + 1) % 3;
+  }
+
+  if(idleLight == 0) {
+    lightBack();
+  }
+  else if(idleLight == 1) {
+    lightMiddle();
+  }
+  else {
+    lightFront();
+  }
+  prevRemainder = currRemainder;
+}
 
 
 void Light::lightUp() {
   analogWrite(LIGHTFRONT, brightness[0]);
   analogWrite(LIGHTLEFT, brightness[1]);
-  analogWrite(LIGHTRIGHT, brightness[2]);
-  analogWrite(LIGHTBACK, brightness[3]);
+  analogWrite(LIGHTRIGHT, brightness[3]);
+  analogWrite(LIGHTBACK, brightness[2]);
+}
+
+void Light::lightFront() {
+  analogWrite(LIGHTFRONT, MAXLIGHT);
+  analogWrite(LIGHTLEFT, 0);
+  analogWrite(LIGHTRIGHT, 0);
+  analogWrite(LIGHTBACK, 0);
+}
+
+void Light::lightMiddle() {
+  analogWrite(LIGHTFRONT, 0);
+  analogWrite(LIGHTLEFT, MAXLIGHT);
+  analogWrite(LIGHTRIGHT, MAXLIGHT);
+  analogWrite(LIGHTBACK, 0);
+}
+
+void Light::lightBack() {
+  analogWrite(LIGHTFRONT, 0);
+  analogWrite(LIGHTLEFT, 0);
+  analogWrite(LIGHTRIGHT, 0);
+  analogWrite(LIGHTBACK, MAXLIGHT);
 }
 
 void Light::lightLow() {

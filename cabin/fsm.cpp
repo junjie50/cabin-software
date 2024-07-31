@@ -87,10 +87,12 @@ void Fsm::meditationFlowCheckState() {
 
 
 
+
 void Fsm::meditationSetUp() {
   resetStates();
   speaker.speakerReset();
-  diffuser.start();
+  diffuserStartTime = millis();
+  diffuserStart = true;
   meditation = true;
   fidget = false;
   heartbeat = true;
@@ -99,23 +101,17 @@ void Fsm::meditationSetUp() {
 void Fsm::meditationExit() {
   speaker.speaker2Stop();
   speaker.speaker1Stop();
-  diffuser.stop();
+  diffuserEndTime = millis();
+  diffuserStart = false;
 }
 
 void Fsm::meditationState() {
-  // state with ligting system
-  if(!heartbeat) {
-    light.meditationNoHBLighting(); // average human hb
-    // buzz
-    // control like static soft pink
-  }
-  else {
-    light.meditationLighting();
-  }
+  // state with ligting system according to the heartbeat that is recorded every second
+  light.meditationLighting(sensor.getHeartBeat());
 
   // additional speaker
   if(fidget){
-    speaker.fidgetStateSpeaker();
+    speaker.fidgetStateSpeaker(fidgetStartTime);
   }
   else {
     speaker.speaker2Stop(); 
@@ -123,6 +119,7 @@ void Fsm::meditationState() {
 
   speaker.meditationSpeaker();
 
+  // State changes
   if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
     meditationExit();
     cabinLightOnSetUp();
@@ -180,7 +177,7 @@ void Fsm::endState() {
   light.endLighting();
   speaker.endStateSpeaker();
 
-  if(speaker.getLoopedTimes() == SPEAKERLOOPCOUNT && sensor.chairPressureNotDetected(ENDNOPRESSURE)) {
+  if(speaker.getLoopedTimes() >= SPEAKERLOOPCOUNT && sensor.chairPressureNotDetected(ENDNOPRESSURE)) {
     endExit();
     cabinLightOnSetUp();
   } 
@@ -197,16 +194,23 @@ void Fsm::endState() {
 
 
 
-
-
 // main loop
 void Fsm::setup() {
   orb.setup(); //setup bluetooth comms with orb
   sensor.setup();
+  diffuser.setup();
   speaker.speakerSetUP(); // set up speaker serial and everything
   idleSetUp();
 }
 
+void Fsm::realtime() {
+  if(diffuserStart) {
+    diffuser.trigger(diffuserStartTime);
+  }
+  else {
+    diffuser.trigger(diffuserEndTime);
+  }
+}
 
 // main loop
 void Fsm::mainloop() {
@@ -214,7 +218,9 @@ void Fsm::mainloop() {
   // sensor collect data every second and 
   // updates include those from orb if orb has sent hb and fidget
   sensor.polling(orb);
- 
+
+  //real time operations
+  realtime();
 
   if(idle) {
     idleState();
@@ -228,5 +234,4 @@ void Fsm::mainloop() {
   else if(meditation) {
     meditationState();
   }
-
 }

@@ -14,12 +14,13 @@ void Speaker::speakerSetUP() {
 }
 
 void Speaker::speakerReset() {
-  loopedCount1 = -1;
+  loopedCount1 = 0;
 }
 
 void Speaker::speaker1Stop() {
   player1.pause();
 }
+
 void Speaker::speaker2Stop() {
   player2.pause();
 }
@@ -36,6 +37,9 @@ int Speaker::getLoopedTimes() {
   if(player1.isPlaying()) {
     return loopedCount1 - 1;
   }
+  else {
+    return loopedCount1;
+  }
 }
 
 void Speaker::fidgetStateSpeakerSetUp() {
@@ -43,15 +47,23 @@ void Speaker::fidgetStateSpeakerSetUp() {
   player2.setVol(SPEAKER2STARTVOL);
 }
 
-void Speaker::fidgetStateSpeaker() {
+void Speaker::fidgetStateSpeaker(unsigned long startTime) {
+  static int prevVolume = SPEAKER2STARTVOL;
   unsigned long currTime = millis();
-  int remainder = (currTime / SECOND) % 5;
+  int volume = min(SPEAKER2MAXVOLUME, SPEAKER2STARTVOL + (startTime - currTime) / SECOND  / 5);
   if(!player2.isPlaying()) {
      player2.playFileNum(1);
   }
-  else if(remainder == 0) {
-    player2Vol++;
-    player2.setVol(player2Vol);
+  else if(prevVolume != volume){
+    prevVolume = volume;
+    player2.setVol(volume);
+  }
+}
+
+void Speaker::endStateSpeaker() {
+  if(!player1.isPlaying()){
+    loopedCount1++;
+    player1.playFileNum(1);
   }
 }
 

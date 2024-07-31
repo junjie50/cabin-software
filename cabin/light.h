@@ -3,24 +3,26 @@
 #include "Arduino.h"
 #include "Constants.h"
 
+
 class Light {
   public:
     void idleLighting();
     void cabinLighting();
     void meditationFlowCheckLighting(bool start);
 
-    void meditationLighting();
+    void meditationLighting(int heartbeat);
     void meditationNoHBLighting();
 
     void endLighting();
     void lightUp();
+    void lightFront();
+    void lightMiddle();
+    void lightBack();
     void lightAll(int power);
     void lightOff();
     void lightLow();
     void setup();
   private:
-    unsigned long idleLightInterval = 2000;
-    unsigned long idleLightIntervalHalf = 1000;
     int idleLight = 0;
     const int frontind = 0;
     const int leftind = 1;

@@ -12,7 +12,7 @@ class Speaker {
     void meditationSpeaker(); // returns the number of times a song looped
     void endStateSpeaker(); // returns the number of times a song looped
     void fidgetStateSpeakerSetUp(); // returns the number of times a song looped
-    void fidgetStateSpeaker(); // returns the number of times a song looped
+    void fidgetStateSpeaker(unsigned long startTime); // returns the number of times a song looped
     int getLoopedTimes();
   private:
     DFRobot_DF1201S player1;

@@ -3,10 +3,8 @@
 #include "Arduino.h"
 #include "light.h"
 #include "Constants.h"
-#include "speaker.h"
 #include "sensor.h"
-#include "diffuser.h"
-#include "orb.h"
+#include "cabin.h"
 
 class Fsm {
   public:
@@ -34,9 +32,6 @@ class Fsm {
   private:
     Light light;
     Sensor sensor;
-    Speaker speaker;
-    Diffuser diffuser;
-    Orb orb;
 
     //State management
     bool idle = true;
