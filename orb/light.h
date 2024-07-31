@@ -4,23 +4,22 @@
 #include "Constants.h"
 #include <FastLED.h>
 
-#define LIGHTGREEN 0x00cc99
-#define LIGHTBLUE 0x00ff99
-
 
 class Light {
   public:
+    void idleLightingSetup();
     void idleLighting();
 
     void cabinLightingSetup();
     void cabinLighting();
 
-    void meditationFlowCheckLighting();
+    void meditationFlowCheckLightingSetup();
+    void meditationFlowCheckLighting(int movement);
 
     void meditationLightingSetup();
-    void meditationLighting();
+    void meditationLighting(int heartbeat);
 
-    void meditationNoHBLighting();
+    void endLightingSetup();
     void endLighting();
 
     void setBrightness(int brightness);
@@ -31,5 +30,8 @@ class Light {
     void setup();
   private:
     CRGB leds[NUMLEDS];
+    CRGB SOFTPINK = CRGB(244,194,194);
+    CRGB LIGHTGREEN = CRGB(218,247,166);
+    CRGB LIGHTBLUE = CRGB(173,216,230);
 };
 #endif

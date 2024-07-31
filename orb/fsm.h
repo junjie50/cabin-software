@@ -42,13 +42,9 @@ class Fsm {
 
     //cabinLightsOn
     bool cabinLightOn = false;
-    unsigned long cabinLightOnStartTime;
 
     // meditation
     bool meditation = false;
-    bool fidget = false;
-    unsigned long fidgetStartTime;
-    bool heartbeat = true;
 
     // end
     bool end = false;

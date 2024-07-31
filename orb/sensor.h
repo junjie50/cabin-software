@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "Constants.h"
 #include "DFRobot_Heartrate.h"
+#include <Wire.h>
 
 class Sensor {
   public:
@@ -10,18 +11,20 @@ class Sensor {
     void polling();
 
     // HEART BEAT SENSOR OPERATIONS
-    bool heartBeatDetected(int time);
-    bool heartBeatNotDetected(int time);
     int getHeartBeat();
 
     // GYRO SENSOR DETECT MOVEMENT
     bool controlMoved();
 
+    //BUZZER
+    void triggerBuzzer(int heartbeat);
+
   private:
-    unsigned long prevTime = 0;
-    int heartBeatTime = 0;
-    int noHeartBeatTime = 0;
+    int heartbeat = 0;
     DFRobot_Heartrate heartrate{DIGITAL_MODE};
 
+    // acclerometer
+    const int MPU = 0x68; // MPU6050 I2C address
+    float AccX, AccY, AccZ;
 };
 #endif

@@ -1,34 +1,54 @@
 #include "light.h"
 
 // Each section lights up by turn and dimming
-void Light::idleLighting(){
+void Light::idleLightingSetup(){
   FastLED.clear(true);
 }
 
 
 // cabin lights turn on
 void Light::cabinLightingSetup() {
-  setColour(CRGB(LIGHTBLUE));
+  FastLED.clear(true);
 }
 
-// cabin lights turn on
-void Light::cabinLighting() {
-  setColour(CRGB(LIGHTBLUE));
+
+// light blue rgb(173, 216, 230)
+void Light::meditationFlowCheckLightingSetup() {
+  setColour(LIGHTBLUE);
 }
 
-void Light::meditationFlowCheckLighting() {
-  setColour(CRGB(LIGHTGREEN));
+void Light::meditationFlowCheckLighting(int movement) {
+  if(!movement) {
+    glimmer(MEDITATIONFLOWCHECKSTATEGLIMMER);
+  }
 }
 
+/*
+################################
+||                            ||
+||         meditation         ||
+||                            ||
+################################
+*/
+// green light
 void Light::meditationLightingSetup() {
-  setColour(CRGB(60,179,113));
+  setColour(LIGHTGREEN);
 }
 
-void Light::meditationLighting() {
-  return;
+void Light::meditationLighting(int heartbeat) {
+  if(heartbeat == 0) {
+    // soft pink
+    setColour(SOFTPINK);
+    setBrightness(MAXBRIGHTNESS);
+    update();
+  }
+  else{
+    glimmer(60000/heartbeat);
+  }
 }
-void Light::meditationNoHBLighting() {
-  return;
+
+void Light::endLightingSetup() {
+   FastLED.clear(true);
 }
 
 // interval in miliseconds
@@ -56,7 +76,6 @@ void Light::setColour(CRGB colour) {
 
 void Light::clearLight() {
   FastLED.clear(true);
-  update();
 }
 
 void Light::update() {

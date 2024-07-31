@@ -11,12 +11,14 @@ void Fsm::resetStates() {
 // IDLE STATE
 void Fsm::idleSetUp() {
   resetStates();
+  light.idleLightingSetup();
   idle = true;
 }
 
 void Fsm::idleState() {
   // idle state lighting system
-  light.idleLighting();
+  // orb do nothing
+  return;
 }
 
 
@@ -26,15 +28,15 @@ void Fsm::idleState() {
 
 void Fsm::cabinLightOnSetUp() {
   resetStates();
+  light.cabinLightingSetup();
   cabinLightOn = true;
-  cabinLightOnStartTime = currTime;
 }
 
 // cabinLightOnState
 void Fsm::cabinLightOnState() {
   // cabinLightOn Lighting
-  // control glimmer at 2s interval
-  light.cabinLighting();
+  // control do nothing
+  return;
 }
 
 
@@ -45,12 +47,12 @@ void Fsm::cabinLightOnState() {
 
 void Fsm::meditationFlowCheckSetUp() {
   resetStates();
+  light.meditationFlowCheckLightingSetup();
   meditationFlowCheck = true;
 }
 
 void Fsm::meditationFlowCheckState() {
-  light.meditationFlowCheckLighting();
-  return;
+  light.meditationFlowCheckLighting(sensor.controlMoved());
 }
 
 
@@ -62,31 +64,16 @@ void Fsm::meditationFlowCheckState() {
 
 void Fsm::meditationSetUp() {
   resetStates();
+  light.meditationLightingSetup();
   meditation = true;
-  fidget = false;
-  heartbeat = true;
-}
-
-void Fsm::meditationExit() {
-  return;
 }
 
 void Fsm::meditationState() {
   // state with ligting system
-  if(!heartbeat) {
-    light.meditationNoHBLighting(); // average human hb
-    // buzz
-    // control like static soft pink
-  }
-  else {
-    light.meditationLighting();
-  }
+  int heartbeat = sensor.getHeartBeat();
+  light.meditationLighting(heartbeat);
+  sensor.triggerBuzzer(heartbeat);
 }
-
-
-
-
-
 
 
 
@@ -96,15 +83,13 @@ void Fsm::endSetUp() {
   end = true;
 }
 
-
 void Fsm::endExit() {
   return;
 }
 
-
 void Fsm::endState() {
-  light.endLighting();
-
+  // does nothing
+  return;
 }
 
 
@@ -115,29 +100,30 @@ void Fsm::endState() {
 void Fsm::setup() {
   sensor.setUp();
   light.setup();
-  light.cabinLightingSetup();
 }
 
 
 // main loop
 void Fsm::mainloop() {
-  light.glimmer(MEDITATIONFLOWCHECKSTATEGLIMMER);
-  // currTime = millis();
-  // // sensor collect data every second and update
-  // sensor.polling();
+  currTime = millis();
+  // sensor collect data every second and update
+  sensor.polling();
 
-  // if(idle) {
-  //   // do nothing. controll off
-  //   idleState();
-  // }
-  // else if(cabinLightOn) {
-  //   cabinLightOnState();
-  // }
-  // else if(meditationFlowCheck) {
-  //   meditationFlowCheckState();
-  // }
-  // else if(meditation) {
-  //   meditationState();
-  // }
+  if(idle) {
+    // do nothing. controll off
+    idleState();
+  }
+  else if(cabinLightOn) {
+    cabinLightOnState();
+  }
+  else if(meditationFlowCheck) {
+    meditationFlowCheckState();
+  }
+  else if(meditation) {
+    meditationState();
+  }
+  else if(end) {
+    endState();
+  }
 
 }

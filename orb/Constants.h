@@ -1,9 +1,10 @@
 #include "Arduino.h"
 #define SECOND 1000
 
+// Meditation flow check state
 #define MEDITATIONFLOWCHECKSTATEGLIMMER 2000
 
-// HEART RATE SENSOR
+// HEART RATE SENSOR ANALOG
 #define HEARTRATESENSOR 21
 
 // BLUETOOTH RX AND TX
@@ -14,3 +15,7 @@
 #define LEDPIN 2
 #define NUMLEDS 12
 #define MAXBRIGHTNESS 60
+
+// BUZZER
+#define BUZZERPIN 8
+#define BUZZERINTERVAL 1000
