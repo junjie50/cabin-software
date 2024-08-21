@@ -9,11 +9,11 @@ class Orb {
     void getMessage(char *buf);
 
     void setup();
-    void sendMessage();
-    void receiveMessage();
+    void sendMessage(char *msg);
+    void receiveMessage(char *buf);
   private:
-    const int RXPIN = 11;
-    const int TXPIN = 12;
+    const int RXPIN = 19;
+    const int TXPIN = 18;
     char bufIn[15];
     char bufOut[15];
     SoftwareSerial BTSerial{RXPIN, TXPIN}; // RX | TX

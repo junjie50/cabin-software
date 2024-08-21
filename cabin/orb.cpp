@@ -14,20 +14,17 @@ void Orb::setup() {
   BTSerial.begin(38400); // HC-05 default speed in AT command mode is 38400
 }
 
-void Orb::sendMessage() {
-  if(BTSerial.availableForWrite() > 10) {
-    BTSerial.write(bufOut, outWriter);
-    outWriter = 0;
-  }
+void Orb::sendMessage(char *msg) {
+  BTSerial.println(msg);
 }
 
-void Orb::receiveMessage() {
-  if(BTSerial.available() && !msgReady) {
-    bufIn[inWriter] = BTSerial.read();
-    if(bufIn[inWriter] == '!') {
-      msgReady = true;
-      bufIn[inWriter] = '\0';
-      inWriter = 0;
+void Orb::receiveMessage(char *buf) {
+  int start = 0;
+  buf[start] = '\0';
+  if(BTSerial.available()) {
+    buf[start++] = BTSerial.read();
+    while(BTSerial.available()) {
+      buf[start++] = BTSerial.read();
     }
   }
 }

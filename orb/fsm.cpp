@@ -6,6 +6,8 @@ void Fsm::resetStates() {
   cabinLightOn = false;
   meditation = false;
   end = false;
+  sensor.reset();
+  light.clearLight();
 }
 
 // IDLE STATE
@@ -70,7 +72,7 @@ void Fsm::meditationSetUp() {
 
 void Fsm::meditationState() {
   // state with ligting system
-  int heartbeat = sensor.getHeartBeat();
+  bool heartbeat = sensor.heartBeat();
   light.meditationLighting(heartbeat);
   sensor.triggerBuzzer(heartbeat);
 }
@@ -92,23 +94,49 @@ void Fsm::endState() {
   return;
 }
 
-
-
+void Fsm::stateChange() {
+  cabin.receiveMessage(buffer);
+  if(strcmp(buffer, "s1") == 0) {
+    idleSetUp();
+  }
+  else if(strcmp(buffer, "s2") == 0) {
+    cabinLightOnSetUp();
+  }
+  else if(strcmp(buffer, "s3") == 0) {
+    meditationFlowCheckSetUp();
+  }
+  else if(strcmp(buffer, "s4") == 0) {
+    meditationSetUp();
+  }
+  else if(strcmp(buffer, "s5") == 0) {
+    endSetUp();
+  }
+}
 
 
 // main loop
 void Fsm::setup() {
   sensor.setUp();
   light.setup();
+  cabin.setup();
+  resetStates();
+  idleSetUp();
 }
 
-
+char data[] = "20,0";
 // main loop
 void Fsm::mainloop() {
   currTime = millis();
   // sensor collect data every second and update
-  sensor.polling();
+  while(true) {
+    cabin.sendMessage(data);
+    delay(1000);
+  }
 
+  sensor.polling(cabin);
+  //if there is sensor pulse, forward it for cabin
+  stateChange();
+  
   if(idle) {
     // do nothing. controll off
     idleState();
@@ -125,5 +153,4 @@ void Fsm::mainloop() {
   else if(end) {
     endState();
   }
-
 }

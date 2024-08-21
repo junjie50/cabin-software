@@ -4,19 +4,28 @@ void Cabin::setup() {
   BTSerial.begin(38400); // HC-05 default speed in AT command mode is 38400
 }
 
-void Cabin::sendMessage() {
-  if(BTSerial.availableForWrite() > 10) {
-    Serial.write(bufOut, outWriter);
+void Cabin::sendMessage(char *msg) {
+  if(BTSerial.availableForWrite() > 0) {
+    BTSerial.write(msg, strlen(msg));
   }
 }
 
-void Cabin::receiveMessage() {
+void Cabin::receiveMessage(char *buf) {
+  int start = 0;
+  buf[start] = '\n';
   if(BTSerial.available()) {
-    bufIn[inWriter] = BTSerial.read();
-    if(bufIn[inWriter] == '!') {
-      msgReady = true;
-      bufIn[inWriter] = '\0';
-      inWriter = 0;
+    buf[start++] = BTSerial.read();
+    while(BTSerial.available()) {
+      buf[start++] = BTSerial.read();
     }
   }
+}
+
+void Cabin::copyAndClearMessage(char *buffer) {
+  strcpy(buffer, bufIn);
+  msgReady = false;
+}
+
+bool Cabin::messageReady(){
+  return msgReady;
 }

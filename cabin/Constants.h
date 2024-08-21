@@ -1,3 +1,5 @@
+#include <DFRobot_Heartrate.h>
+
 #include "Arduino.h"
 #define SECOND 1000
 
@@ -20,36 +22,40 @@
 
 
 //SPEAKER CONSTANTS
-#define SPEAKER1SERIAL Serial1
-#define SPEAKER2SERIAL Serial2
+#define SPEAKER1SERIAL Serial2
+#define SPEAKER2SERIAL Serial3
 #define SPEAKER2STARTVOL 10
 #define SPEAKER2MAXVOLUME 30
 
 // PIR SENSOR
-#define PIRPIN 20
+#define PIRPIN 53
 
 // BLUETOOTH RX TX
 #define BTRXPIN 10
 #define BTTXPIN 11
 
 // PRESSURE SENSOR
-#define PRESSUREPIN 36
-#define PRESSUREHIGH 500
+#define PRESSUREPIN A15
+#define PRESSUREHIGH 610
 
 // LIGHT PWM PINS
-#define LIGHTFRONT 10
-#define LIGHTLEFT 11
-#define LIGHTRIGHT 12
-#define LIGHTBACK 13
-#define MAXLIGHT 150
-#define MINLIGHT 0
+#define LIGHTFRONT 45
+#define LIGHTLEFT 44
+#define LIGHTRIGHT 2
+#define LIGHTBACK 3
+#define LIGHTCHAIR 4
+
+#define MAXLIGHT 240
+#define MINLIGHT 1
 #define LOWLIGHT 50
+
+#define MAXLIGHTCHAIR 10
 
 // HEARTBEAT 
 #define AVGHEARTBEAT 60
 
 // DIFFUSER PIN
-#define DIFFUSERPIN 34
+#define DIFFUSERPIN 51
 
 
 

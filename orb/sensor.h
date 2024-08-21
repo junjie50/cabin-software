@@ -3,28 +3,39 @@
 #include "Arduino.h"
 #include "Constants.h"
 #include "DFRobot_Heartrate.h"
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include "cabin.h"
 
 class Sensor {
   public:
     void setUp();
-    void polling();
+    void reset();
+    void polling(Cabin cabin);
 
     // HEART BEAT SENSOR OPERATIONS
     int getHeartBeat();
+    bool heartBeat();
+    bool noHeartBeatFor(int duration);
 
     // GYRO SENSOR DETECT MOVEMENT
     bool controlMoved();
 
     //BUZZER
-    void triggerBuzzer(int heartbeat);
+    void triggerBuzzer(bool heartbeat);
+
 
   private:
     int heartbeat = 0;
     DFRobot_Heartrate heartrate{DIGITAL_MODE};
+    Adafruit_MPU6050 mpu;
+    bool pulse;
+    
+    unsigned long prevRecorded = 0;
+    unsigned long noHBTime = 0;
 
     // acclerometer
-    const int MPU = 0x68; // MPU6050 I2C address
-    float AccX, AccY, AccZ;
+    bool motion = false;
 };
 #endif

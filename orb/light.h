@@ -14,10 +14,10 @@ class Light {
     void cabinLighting();
 
     void meditationFlowCheckLightingSetup();
-    void meditationFlowCheckLighting(int movement);
+    void meditationFlowCheckLighting(bool movement);
 
     void meditationLightingSetup();
-    void meditationLighting(int heartbeat);
+    void meditationLighting(bool heartbeat);
 
     void endLightingSetup();
     void endLighting();
@@ -26,12 +26,10 @@ class Light {
     void clearLight();
     void setColour(CRGB colour);
     void glimmer(int interval);
+    void beatOnce(bool heartbeat);
     void update();
     void setup();
   private:
     CRGB leds[NUMLEDS];
-    CRGB SOFTPINK = CRGB(244,194,194);
-    CRGB LIGHTGREEN = CRGB(218,247,166);
-    CRGB LIGHTBLUE = CRGB(173,216,230);
 };
 #endif

@@ -29,9 +29,14 @@ class Fsm {
     void endState();
     void endExit();
 
+    void stateChange();
+
   private:
     Light light;
     Sensor sensor;
+    Cabin cabin;
+
+    char buffer[15];
 
     //State management
     bool idle = true;

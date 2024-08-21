@@ -1,56 +1,118 @@
 #include "sensor.h"
 
 void Sensor:: setUp(){
-  Wire.begin();
-  Wire.beginTransmission(MPU);       // Start communication with MPU6050 // MPU=0x68
-  Wire.write(0x6B);                  // Talk to the register 6B
-  Wire.write(0x00);                  // Make reset - place a 0 into the 6B register
-  Wire.endTransmission(true);        //end the transmission
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+
+  //setupt motion detection
+  mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
+  mpu.setMotionDetectionThreshold(3);
+  mpu.setMotionDetectionDuration(20);
+  mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn off when reinitialized.
+  mpu.setInterruptPinPolarity(true);
+  mpu.setMotionInterrupt(true);
 
   pinMode(BUZZERPIN,OUTPUT);    // Set the digital pin(11) as output
   delay(20);
 }
 
-void Sensor::polling() {
+void Sensor::polling(Cabin cabin) {
   static unsigned long prevSecond = 0;
-  unsigned long currTime = millis() / SECOND;
+  static unsigned long prevHB = 0;
+  static unsigned long prevValid = 0;
+  static unsigned long prevPoll = 0;
+  unsigned long currTimeMilli = millis();
+  unsigned long diff = currTimeMilli- prevPoll;
+  unsigned long currTime = currTimeMilli / SECOND;
+  int currHeartBeat = 0;
+
+  // only poll hr sensor everyone 3ms
+  if(diff > 30) {
+    prevPoll = currTimeMilli;
+    heartrate.getValue(HEARTRATESENSOR);   // A1 foot sampled values
+    currHeartBeat = heartrate.getRate();   // A1 foot sampled values
+  }
+
+  // keep recording prev heartrate
+  if(currHeartBeat) {
+    prevValid = currHeartBeat;
+    prevRecorded = currTimeMilli;
+    pulse = true;
+    Serial.println("pulse true");
+  }
+  else{
+    pulse = false;
+  }
+
+  unsigned long remainHB = millis() / 100;
+  if(remainHB != prevHB) {
+    prevHB = remainHB;
+    if(prevValid) {
+      noHBTime = 0;
+      heartbeat = prevValid;
+      prevValid = 0;
+    }
+    else {
+      noHBTime++;
+      if(noHBTime == 50) { // 2 s without heartbeat clear heartbeat to 0
+        heartbeat = 0;
+      }
+    }
+  }
+
+  // every second update from gyro
   if(currTime != prevSecond) {
     prevSecond = currTime;
-    heartbeat = heartrate.getValue(HEARTRATESENSOR);
-
-    // get gyro accelerations
-    Wire.beginTransmission(MPU);
-    Wire.write(0x3B); // Start with register 0x3B (ACCEL_XOUT_H)
-    Wire.endTransmission(false);
-    Wire.requestFrom(MPU, 6, true); // Read 6 registers total, each axis value is stored in 2 registers
-    //For a range of +-2g, we need to divide the raw values by 16384, according to the datasheet
-    AccX = (Wire.read() << 8 | Wire.read()) / 16384.0; // X-axis value
-    AccY = (Wire.read() << 8 | Wire.read()) / 16384.0; // Y-axis value
-    AccZ = (Wire.read() << 8 | Wire.read()) / 16384.0; // Z-axis value
+    if(mpu.getMotionInterruptStatus()) {
+      motion = true;
+    }
+    else {
+      motion = false;
+    }
   }
 }
 
-void Sensor::triggerBuzzer(int heartbeat){
-  if(heartbeat > 0) {
-    digitalWrite(BUZZERPIN, LOW);
+void Sensor::reset() {
+  analogWrite(BUZZERPIN, LOW);
+  mpu.getMotionInterruptStatus();
+}
+
+void Sensor::triggerBuzzer(bool heartbeat){
+  static unsigned long prevHeartBeat = 0;
+  unsigned long currTime = millis();
+
+  if(heartbeat) {
+    prevHeartBeat = currTime;
+  }
+
+  int diff = currTime - prevHeartBeat;
+  if(diff > 1000) {
+    analogWrite(BUZZERPIN, BUZZERPOWER);
   }
   else{
-    const int remainder = millis() % BUZZERINTERVAL;
-    const int half = BUZZERINTERVAL / 2;
-    if(remainder > half) {
-      digitalWrite(BUZZERPIN, LOW);
-    }
-    else{
-      digitalWrite(BUZZERPIN, HIGH);
-    }
+    analogWrite(BUZZERPIN, LOW);
   }
 }
 
 bool Sensor::controlMoved() {
-  return false;
+  return motion;
 }
 
 int Sensor::getHeartBeat() {
   return heartbeat;
+}
+
+bool Sensor::heartBeat() {
+  return pulse;
+}
+
+bool Sensor::noHeartBeatFor(int duration) {
+  unsigned long diff = millis() - prevRecorded;
+  return diff > duration;
 }
 

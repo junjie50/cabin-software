@@ -21,6 +21,8 @@ class Light {
     void lightAll(int power);
     void lightOff();
     void lightLow();
+    void lightChair(int power);
+    void offChair();
     void setup();
   private:
     int idleLight = 0;

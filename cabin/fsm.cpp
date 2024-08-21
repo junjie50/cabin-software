@@ -38,17 +38,16 @@ void Fsm::cabinLightOnState() {
   // cabinLightOn Lighting
   light.cabinLighting();
 
-  int seconds = (cabinLightOnStartTime - currTime) / SECOND;
+  int seconds = (currTime - cabinLightOnStartTime) / SECOND;
+
+  if(sensor.cabinMotionDetected()) {
+    cabinLightOnStartTime = currTime;
+  }
 
   // Change in state, if not remain the same
   if(seconds >= CABINLIGHTINTERVAL) {
     // check if there is movement
-    if(sensor.cabinMotionDetected()) {
-      cabinLightOnSetUp(); // goes back to same state
-    }
-    else {
-      idleSetUp(); // goes back to original state
-    }
+    idleSetUp(); // goes back to original state
   }
   else if(sensor.chairPressureDetected(CHAIRDETECTTIME)) {
     meditationFlowCheckSetUp();
@@ -197,9 +196,12 @@ void Fsm::endState() {
 // main loop
 void Fsm::setup() {
   orb.setup(); //setup bluetooth comms with orb
+  Serial.println("blueooth up");
   sensor.setup();
   diffuser.setup();
   speaker.speakerSetUP(); // set up speaker serial and everything
+  light.setup();
+
   idleSetUp();
 }
 
@@ -212,15 +214,41 @@ void Fsm::realtime() {
   }
 }
 
+int count = 0;
 // main loop
 void Fsm::mainloop() {
-  currTime = millis();
+  currTime = millis(); // system clock
   // sensor collect data every second and 
   // updates include those from orb if orb has sent hb and fidget
   sensor.polling(orb);
+  char buf[15];
+  orb.receiveMessage(buf);
+  if(strlen(buf) > 0) {
+    Serial.println(strlen(buf));
+    Serial.println(buf);
+  }
+  // //real time operations
+  // realtime();
+  
 
-  //real time operations
-  realtime();
+  // TESTING TESTING TESTING
+  // light.meditationLighting(false);
+  // delay(1000);
+  // currTime = millis();
+  // bool start = false;
+  // while((millis() - currTime) < 6000) {
+  //   if(!start) {
+  //     light.meditationLighting(true);
+  //     start = true;
+  //   }
+  //   else {
+  //     light.meditationLighting(false); 
+  //   }
+  // }
+
+  // delay(2000);
+
+    // TESTING TESTING TESTING
 
   if(idle) {
     idleState();
@@ -233,5 +261,8 @@ void Fsm::mainloop() {
   }
   else if(meditation) {
     meditationState();
+  }
+  else if(end) {
+    endState();
   }
 }

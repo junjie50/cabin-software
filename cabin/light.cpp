@@ -2,8 +2,8 @@
 
 // Each section lights up by turn and dimming
 void Light::idleLighting() {
-  static unsigned long idleLightInterval = 2000;
-  static unsigned long idleLightIntervalHalf = 1000;
+  static unsigned long idleLightInterval = 4000;
+  static unsigned long idleLightIntervalHalf = 2000;
   static unsigned long time = millis();
   static unsigned long prevRemainder = 0;
   time = millis();
@@ -15,17 +15,30 @@ void Light::idleLighting() {
   prevRemainder = currRemainder;
 
   if(currRemainder > idleLightIntervalHalf) {
-    currRemainder = idleLightIntervalHalf - currRemainder;
+    currRemainder = idleLightInterval - currRemainder;
   }
-
-  int output = (currRemainder / SECOND) * MAXLIGHT;
+  
+  int output = (currRemainder / (double)idleLightIntervalHalf) * MAXLIGHT + MINLIGHT;
   brightness[idleLight] = output;
   lightUp();
+  offChair();
 }
 
 // cabin lights turn on
 void Light::cabinLighting() {
+  static unsigned long intervalChair = 1000;
+  static unsigned long intervalHalfChair = 500;
+  static unsigned long time;
+  time = millis();
   lightAll(MAXLIGHT);
+
+  unsigned long remainder = time % intervalChair;
+  if(remainder > intervalHalfChair) {
+    remainder = intervalChair - remainder;
+  }
+
+  int powerChair = (remainder / (double)intervalHalfChair) * MAXLIGHTCHAIR ;
+  lightChair(powerChair);
 }
 
 // meditation flow light sequence
@@ -33,37 +46,60 @@ void Light::meditationFlowCheckLighting(bool start) {
   static unsigned long startTime = 0;
   static unsigned long time;
   static unsigned long interval = 4000;
+  static unsigned long intervalHalf = 2000;
+
+  static unsigned long intervalChair = 1000;
+  static unsigned long intervalHalfChair = 500;
   if(start) {startTime = millis();} 
 
   time = millis();
-  unsigned long remainder = (time - startTime);
-  int power = (interval - remainder) / SECOND * MAXLIGHT;
+  long timeDiff = (time - startTime);
+  int power = ((long)interval - timeDiff) / (double)interval * MAXLIGHT + MINLIGHT;
 
-  if(power < LOWLIGHT) {
-    lightAll(LOWLIGHT);
+  if(power < MINLIGHT) {
+    lightAll(MINLIGHT);
   }
   else {
     lightAll(power);
   }
+  offChair();
 }
 
 void Light::meditationLighting(int heartbeat) {
   static unsigned long time = millis();
-  static unsigned minute = 60000;
-  static unsigned int interval;
-  if(heartbeat == 0) {
-    heartbeat = AVGHEARTBEAT;
+  static unsigned int interval = 250;
+  static unsigned int half = 125;
+  static unsigned long startTime = 0;
+  static unsigned long TIMEDIFFLIMIT = 2000;
+  static unsigned long defaultInterval = 60000/AVGHEARTBEAT;
+  static unsigned long defaultIntervalHalf = defaultInterval / 2;
+  
+
+  unsigned currTime = millis();
+  if(heartbeat) {
+    startTime = currTime;
+  }
+  unsigned long timeDiff = currTime - startTime;
+  if(timeDiff > interval) { // if not receiving heart beat for a long time.
+    if(timeDiff > TIMEDIFFLIMIT) { // if never receive for too long, go to default human heart beat.
+      int remainder = timeDiff % defaultInterval;
+      if(remainder > defaultIntervalHalf) {
+        remainder = defaultInterval - remainder;
+      }
+      int power = (remainder / (double) defaultIntervalHalf) * MAXLIGHT + MINLIGHT;
+      lightAll(power);
+    }
+    else{ // if within heartbeat range, just lightAll to low
+      lightAll(MINLIGHT);
+    }
+    return;
   }
 
-  interval = minute / heartbeat;
-  unsigned long half = interval / 2;
-  time = millis();
-  unsigned long remainder = time % interval;
-  if(remainder > half) {
-    remainder = (interval - remainder);
+  if(timeDiff > half) {
+    timeDiff = (interval - timeDiff);
   }
-
-  lightAll(remainder / SECOND * MAXLIGHT);
+  int power = (timeDiff / (double)half) * MAXLIGHT + MINLIGHT;
+  lightAll(power);
 }
 
 void Light::endLighting() {
@@ -138,6 +174,14 @@ void Light::lightOff() {
   analogWrite(LIGHTLEFT, 0);
   analogWrite(LIGHTRIGHT, 0);
   analogWrite(LIGHTBACK, 0);
+}
+
+void Light::lightChair(int power) {
+  analogWrite(LIGHTCHAIR, power);
+}
+
+void Light::offChair() {
+  analogWrite(LIGHTCHAIR, 0);
 }
 
 void Light::setup() {

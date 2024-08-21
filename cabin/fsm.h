@@ -63,6 +63,5 @@ class Fsm {
     bool diffuserStart = false;
     unsigned long diffuserStartTime;
     unsigned long diffuserEndTime;
-
 };
 #endif

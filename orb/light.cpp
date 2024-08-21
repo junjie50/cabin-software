@@ -1,4 +1,5 @@
 #include "light.h"
+#define LIGHTBLUE 0x3333ff
 
 // Each section lights up by turn and dimming
 void Light::idleLightingSetup(){
@@ -17,9 +18,13 @@ void Light::meditationFlowCheckLightingSetup() {
   setColour(LIGHTBLUE);
 }
 
-void Light::meditationFlowCheckLighting(int movement) {
+void Light::meditationFlowCheckLighting(bool movement) {
   if(!movement) {
     glimmer(MEDITATIONFLOWCHECKSTATEGLIMMER);
+  }
+  else {
+    setBrightness(MAXBRIGHTNESS);
+    update();
   }
 }
 
@@ -32,19 +37,11 @@ void Light::meditationFlowCheckLighting(int movement) {
 */
 // green light
 void Light::meditationLightingSetup() {
-  setColour(LIGHTGREEN);
+  setColour(0x33ff33);
 }
 
-void Light::meditationLighting(int heartbeat) {
-  if(heartbeat == 0) {
-    // soft pink
-    setColour(SOFTPINK);
-    setBrightness(MAXBRIGHTNESS);
-    update();
-  }
-  else{
-    glimmer(60000/heartbeat);
-  }
+void Light::meditationLighting(bool heartbeat) {
+  beatOnce(heartbeat);
 }
 
 void Light::endLightingSetup() {
@@ -60,6 +57,38 @@ void Light::glimmer(int interval) {
     remainder = interval - remainder;
   }
   int brightness = remainder / (double)half * MAXBRIGHTNESS;
+  setBrightness(brightness);
+  update();
+}
+
+// interval in 300ms
+void Light::beatOnce(bool heartBeat) {
+  static unsigned long startTime = 0;
+  unsigned long time = millis();
+  unsigned long diff = (time - startTime);
+  if(heartBeat && diff > BEATINTERVAL) {
+    setColour(0x33ff33);
+    startTime = time;
+  }
+
+  int brightness;
+  if(diff > BEATINTERVAL) {
+    if(diff > 2000) {
+      brightness = MAXBRIGHTNESS;
+      setColour(0xff3333);
+    }
+    else {
+      brightness = 0;
+    }
+  }
+  else if(diff > BEATINTERVALHALF) {
+    double remainder = (double)(BEATINTERVAL - diff) / BEATINTERVALHALF ;
+    brightness = remainder * MAXBRIGHTNESS;
+  }
+  else {
+    double remainder = (double)diff / BEATINTERVALHALF ;
+    brightness = remainder * MAXBRIGHTNESS;
+  }
   setBrightness(brightness);
   update();
 }
