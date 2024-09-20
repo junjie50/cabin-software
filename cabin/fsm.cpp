@@ -221,34 +221,10 @@ void Fsm::mainloop() {
   // sensor collect data every second and 
   // updates include those from orb if orb has sent hb and fidget
   sensor.polling(orb);
-  char buf[15];
-  orb.receiveMessage(buf);
-  if(strlen(buf) > 0) {
-    Serial.println(strlen(buf));
-    Serial.println(buf);
-  }
-  // //real time operations
-  // realtime();
   
+  realtime();
 
-  // TESTING TESTING TESTING
-  // light.meditationLighting(false);
-  // delay(1000);
-  // currTime = millis();
-  // bool start = false;
-  // while((millis() - currTime) < 6000) {
-  //   if(!start) {
-  //     light.meditationLighting(true);
-  //     start = true;
-  //   }
-  //   else {
-  //     light.meditationLighting(false); 
-  //   }
-  // }
 
-  // delay(2000);
-
-    // TESTING TESTING TESTING
 
   if(idle) {
     idleState();

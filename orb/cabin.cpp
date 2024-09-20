@@ -5,9 +5,7 @@ void Cabin::setup() {
 }
 
 void Cabin::sendMessage(char *msg) {
-  if(BTSerial.availableForWrite() > 0) {
-    BTSerial.write(msg, strlen(msg));
-  }
+    BTSerial.print(msg);
 }
 
 void Cabin::receiveMessage(char *buf) {

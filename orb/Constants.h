@@ -19,6 +19,6 @@
 #define MAXBRIGHTNESS 40
 
 // BUZZER
-#define BUZZERPIN 10
+#define BUZZERPIN 9
 #define BUZZERINTERVAL 1000
 #define BUZZERPOWER 80 // range 80 - 255

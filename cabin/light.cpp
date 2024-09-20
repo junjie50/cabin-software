@@ -83,10 +83,15 @@ void Light::meditationLighting(int heartbeat) {
   if(timeDiff > interval) { // if not receiving heart beat for a long time.
     if(timeDiff > TIMEDIFFLIMIT) { // if never receive for too long, go to default human heart beat.
       int remainder = timeDiff % defaultInterval;
-      if(remainder > defaultIntervalHalf) {
-        remainder = defaultInterval - remainder;
+      if(remainder > interval) {
+        return;
       }
-      int power = (remainder / (double) defaultIntervalHalf) * MAXLIGHT + MINLIGHT;
+
+      if(remainder > half) {
+        remainder = interval - remainder;
+      }
+
+      int power = (remainder / (double) half) * MAXLIGHT + MINLIGHT;
       lightAll(power);
     }
     else{ // if within heartbeat range, just lightAll to low

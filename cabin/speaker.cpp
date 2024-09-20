@@ -13,8 +13,10 @@ void Speaker::speakerSetUP() {
   }
   Serial.println(F("DFPlayer Mini online."));
   
-  player1.setVol(1);  //Set volume value. From 0 to 30
-  player2.setVol(1);  //Set volume value. From 0 to 30
+  player1.setVol(5);  //Set volume value. From 0 to 30
+  player2.setVol(5);  //Set volume value. From 0 to 30
+  player1.start();
+
 }
 
 void Speaker::speakerReset() {

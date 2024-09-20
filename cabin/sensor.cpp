@@ -4,29 +4,29 @@ void Sensor::polling(Orb orb) {
   static unsigned long prevTime = 0;
   unsigned long currTime = (millis()/SECOND);
   // process data transmission from slave controller
-  // orb.receiveMessage();
-  // if(orb.messageReady()) {
-  //   orb.getMessage(bufIn);
-  //   char *res = strtok(bufIn, ',');
-  //   int count = 0;
-  //   // send data in the format (heartrate, fidget)
-  //   while(res != NULL) {
-  //     int curr = atoi(res);
-  //     if(count == 0) {
-  //       heartBeat = curr;
-  //     }
-  //     else {
-  //       if(curr == 1) {
-  //         fidget = true;
-  //       }
-  //       else{
-  //         fidget = false;
-  //       }
-  //     }
-  //     count++;
-  //     res = strtok(NULL, ',');
-  //   }
-  // }
+  orb.receiveMessage();
+  if(orb.messageReady()) {
+    orb.getMessage(bufIn);
+    char *res = strtok(bufIn, ',');
+    int count = 0;
+    // send data in the format (heartrate, fidget)
+    while(res != NULL) {
+      int curr = atoi(res);
+      if(count == 0) {
+        heartBeat = curr;
+      }
+      else {
+        if(curr == 1) {
+          fidget = true;
+        }
+        else{
+          fidget = false;
+        }
+      }
+      count++;
+      res = strtok(NULL, ',');
+    }
+  }
 
   if(currTime != prevTime) { // poll every second
     prevTime = currTime; // prev second recorded

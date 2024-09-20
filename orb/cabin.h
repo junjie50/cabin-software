@@ -14,8 +14,8 @@ class Cabin {
     void copyAndClearMessage(char *buffer);
     
   private:
-    const int RXPIN = 0;
-    const int TXPIN = 1;
+    const int RXPIN = 11;
+    const int TXPIN = 10;
     char bufIn[15];
     char bufOut[15];
     SoftwareSerial BTSerial{RXPIN, TXPIN}; // RX | TX

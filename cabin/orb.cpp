@@ -11,20 +11,21 @@ void Orb::getMessage(char *buf) {
 
 
 void Orb::setup() {
-  BTSerial.begin(38400); // HC-05 default speed in AT command mode is 38400
+  Serial1.begin(38400); // HC-05 default speed in AT command mode is 38400
 }
 
 void Orb::sendMessage(char *msg) {
-  BTSerial.println(msg);
+  Serial1.println(msg);
 }
 
 void Orb::receiveMessage(char *buf) {
   int start = 0;
   buf[start] = '\0';
-  if(BTSerial.available()) {
-    buf[start++] = BTSerial.read();
-    while(BTSerial.available()) {
-      buf[start++] = BTSerial.read();
+  if(Serial1.available()) {
+    Serial.println("avail");
+    buf[start++] = Serial1.read();
+    while(Serial1.available()) {
+      buf[start++] = Serial1.read();
     }
   }
 }
