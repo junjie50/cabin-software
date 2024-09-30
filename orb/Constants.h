@@ -10,8 +10,8 @@
 #define BEATINTERVALHALF 100
 
 // BLUETOOTH RX AND TX
-#define BTRXPIN 10
-#define BTTXPIN 11
+#define BTRXPIN 11
+#define BTTXPIN 10
 
 // LED RING
 #define LEDPIN 2

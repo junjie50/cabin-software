@@ -40,6 +40,9 @@ class Sensor {
     int heartBeat = 0; 
     bool fidget = false; 
 
+    unsigned long prevBeat = 0;
+    unsigned long prevFidget = 0;
+
 
     // duration tracker for state change
     int chairPressureTime = 0;

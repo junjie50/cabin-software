@@ -8,6 +8,7 @@ void Cabin::sendMessage(char *msg) {
     BTSerial.print(msg);
 }
 
+// Clears the buffer everytime it is being called.
 void Cabin::receiveMessage(char *buf) {
   int start = 0;
   buf[start] = '\n';
@@ -16,8 +17,10 @@ void Cabin::receiveMessage(char *buf) {
     while(BTSerial.available()) {
       buf[start++] = BTSerial.read();
     }
+    buf[start] = '\0';
   }
 }
+
 
 void Cabin::copyAndClearMessage(char *buffer) {
   strcpy(buffer, bufIn);

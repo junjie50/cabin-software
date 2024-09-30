@@ -17,7 +17,7 @@ void Sensor:: setUp(){
   mpu.setInterruptPinPolarity(true);
   mpu.setMotionInterrupt(true);
 
-  pinMode(BUZZERPIN,OUTPUT);    // Set the digital pin(11) as output
+  pinMode(BUZZERPIN,OUTPUT);    // Set the digital pin(9) as output
   delay(20);
 }
 
@@ -26,53 +26,62 @@ void Sensor::polling(Cabin cabin) {
   static unsigned long prevHB = 0;
   static unsigned long prevValid = 0;
   static unsigned long prevPoll = 0;
+
   unsigned long currTimeMilli = millis();
-  unsigned long diff = currTimeMilli- prevPoll;
+  // curr time in seconds
   unsigned long currTime = currTimeMilli / SECOND;
+
+  // diff in time from the prev poll
+  unsigned long diff = currTimeMilli- prevPoll;
+
+
   int currHeartBeat = 0;
 
-  // only poll hr sensor everyone 3ms
+  // Keep collecting the data, if diff is greater than 30, check the sensors for next pulse
   if(diff > 30) {
-    prevPoll = currTimeMilli;
-    heartrate.getValue(HEARTRATESENSOR);   // A1 foot sampled values
+    heartrate.getValue(HEARTRATESENSOR);
     currHeartBeat = heartrate.getRate();   // A1 foot sampled values
   }
 
-  // keep recording prev heartrate
+  // keep recording prev heartrate, if currHeartBeat > 0, pulse is true
   if(currHeartBeat) {
+    // only poll hr sensor every 30ms, 120 per minute is 50ms interval
+    prevPoll = currTimeMilli;
     prevValid = currHeartBeat;
     prevRecorded = currTimeMilli;
     pulse = true;
     Serial.println("pulse true");
   }
-  else{
+  else{ // reset pulse to false.
     pulse = false;
   }
 
+
+  // keep track of prev heartbeat incase of no detection every 100ms
   unsigned long remainHB = millis() / 100;
   if(remainHB != prevHB) {
     prevHB = remainHB;
     if(prevValid) {
       noHBTime = 0;
-      heartbeat = prevValid;
+      heartbeat = prevValid; // store the prevValid heartbeat
       prevValid = 0;
     }
     else {
       noHBTime++;
-      if(noHBTime == 50) { // 2 s without heartbeat clear heartbeat to 0
+      if(noHBTime == 50) { // 5 s without heartbeat clear heartbeat to 0
         heartbeat = 0;
       }
     }
   }
 
+  // motion in this cycle default to false
+  motion = false;
   // every second update from gyro
   if(currTime != prevSecond) {
     prevSecond = currTime;
     if(mpu.getMotionInterruptStatus()) {
+      // if it is true, return true for this cycle
       motion = true;
-    }
-    else {
-      motion = false;
     }
   }
 }

@@ -31,8 +31,8 @@
 #define PIRPIN 53
 
 // BLUETOOTH RX TX
-#define BTRXPIN 10
-#define BTTXPIN 11
+#define BTRXPIN 11
+#define BTTXPIN 10
 
 // PRESSURE SENSOR
 #define PRESSUREPIN A15

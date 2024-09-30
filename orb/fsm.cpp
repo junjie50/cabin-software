@@ -24,10 +24,6 @@ void Fsm::idleState() {
 }
 
 
-
-
-
-
 void Fsm::cabinLightOnSetUp() {
   resetStates();
   light.cabinLightingSetup();
@@ -95,7 +91,9 @@ void Fsm::endState() {
 }
 
 void Fsm::stateChange() {
+  // This part receives the update
   cabin.receiveMessage(buffer);
+
   if(strcmp(buffer, "s1") == 0) {
     idleSetUp();
   }
@@ -113,6 +111,19 @@ void Fsm::stateChange() {
   }
 }
 
+void Fsm::sendEvent() {
+  if(sensor.heartBeat()) {
+    buffer[0] = 'b';
+    buffer[1] = '\n';
+    cabin.sendMessage(buffer);
+  }
+  else if(sensor.controlMoved()) {
+    buffer[0] = 'm';
+    buffer[1] = '\n';
+    cabin.sendMessage(buffer);
+  }
+}
+
 
 // main loop
 void Fsm::setup() {
@@ -123,19 +134,17 @@ void Fsm::setup() {
   idleSetUp();
 }
 
-char data[] = "20,0";
 // main loop
 void Fsm::mainloop() {
   currTime = millis();
   // sensor collect data every second and update
-  while(true) {
-    cabin.sendMessage(data);
-    delay(1000);
-  }
-
   sensor.polling(cabin);
-  //if there is sensor pulse, forward it for cabin
+
+  // update orb state
   stateChange();
+
+  // send out events to the cabin
+  sendEvent();
   
   if(idle) {
     // do nothing. controll off

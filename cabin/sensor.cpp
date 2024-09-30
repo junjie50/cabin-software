@@ -4,33 +4,25 @@ void Sensor::polling(Orb orb) {
   static unsigned long prevTime = 0;
   unsigned long currTime = (millis()/SECOND);
   // process data transmission from slave controller
-  orb.receiveMessage();
-  if(orb.messageReady()) {
-    orb.getMessage(bufIn);
-    char *res = strtok(bufIn, ',');
-    int count = 0;
-    // send data in the format (heartrate, fidget)
-    while(res != NULL) {
-      int curr = atoi(res);
-      if(count == 0) {
-        heartBeat = curr;
-      }
-      else {
-        if(curr == 1) {
-          fidget = true;
-        }
-        else{
-          fidget = false;
-        }
-      }
-      count++;
-      res = strtok(NULL, ',');
+  orb.receiveMessage(bufIn);
+
+  // default to 0
+  heartBeat = 0;
+  fidget = false;
+  if(strlen(bufIn) > 0) { // if there is something coming in
+    if(bufIn[0] == 'b') {
+      heartBeat = 1;
+      prevBeat = currTime;
+    }
+    else {
+      fidget = true;
+      prevFidget = currTime;
     }
   }
 
   if(currTime != prevTime) { // poll every second
     prevTime = currTime; // prev second recorded
-    if(heartBeatHigh()) {
+    if((currTime - prevBeat) < 1100) {
       heartBeatTime++;
       noHeartBeatTime = 0;
     }
@@ -48,7 +40,7 @@ void Sensor::polling(Orb orb) {
       chairPressureTime = 0;
     }
 
-    if(fidgetHigh()) {
+    if((currTime - prevFidget) < 1100) {
       fidgetTime++;
     }
     else{

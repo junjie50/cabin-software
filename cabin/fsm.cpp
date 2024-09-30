@@ -224,8 +224,6 @@ void Fsm::mainloop() {
   
   realtime();
 
-
-
   if(idle) {
     idleState();
   }

@@ -31,6 +31,8 @@ class Fsm {
 
     void stateChange();
 
+    void sendEvent();
+
   private:
     Light light;
     Sensor sensor;
