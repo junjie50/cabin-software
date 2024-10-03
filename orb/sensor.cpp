@@ -9,7 +9,7 @@ void Sensor:: setUp(){
   }
   Serial.println("MPU6050 Found!");
 
-  //setupt motion detection
+  //setup motion detection
   mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
   mpu.setMotionDetectionThreshold(3);
   mpu.setMotionDetectionDuration(20);

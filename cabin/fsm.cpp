@@ -11,6 +11,8 @@ void Fsm::resetStates() {
 // IDLE STATE
 void Fsm::idleSetUp() {
   resetStates();
+  char msg[3] = "s1";
+  orb.sendMessage(msg);
   idle = true;
 }
 
@@ -29,6 +31,8 @@ void Fsm::idleState() {
 
 void Fsm::cabinLightOnSetUp() {
   resetStates();
+  char msg[3] = "s2";
+  orb.sendMessage(msg);
   cabinLightOn = true;
   cabinLightOnStartTime = currTime;
 }
@@ -62,6 +66,8 @@ void Fsm::cabinLightOnState() {
 
 void Fsm::meditationFlowCheckSetUp() {
   resetStates();
+  char msg[3] = "s3";
+  orb.sendMessage(msg);
   light.meditationFlowCheckLighting(true);
   meditationFlowCheck = true;
 }
@@ -88,6 +94,8 @@ void Fsm::meditationFlowCheckState() {
 
 void Fsm::meditationSetUp() {
   resetStates();
+  char msg[3] = "s4";
+  orb.sendMessage(msg);
   speaker.speakerReset();
   diffuserStartTime = millis();
   diffuserStart = true;
@@ -161,6 +169,8 @@ void Fsm::meditationState() {
 
 void Fsm::endSetUp() {
   resetStates();
+  char msg[3] = "s5";
+  orb.sendMessage(msg);
   end = true;
 }
 
