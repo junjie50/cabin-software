@@ -86,7 +86,6 @@ void Fsm::meditationFlowCheckState() {
 
 
 
-
 void Fsm::meditationSetUp() {
   resetStates();
   speaker.speakerReset();
@@ -196,7 +195,6 @@ void Fsm::endState() {
 // main loop
 void Fsm::setup() {
   orb.setup(); //setup bluetooth comms with orb
-  Serial.println("blueooth up");
   sensor.setup();
   diffuser.setup();
   speaker.speakerSetUP(); // set up speaker serial and everything
@@ -226,17 +224,22 @@ void Fsm::mainloop() {
 
   if(idle) {
     idleState();
+    Serial.println("idle");
   }
   else if(cabinLightOn) {
     cabinLightOnState();
+    Serial.println("cabinlight");
   }
   else if(meditationFlowCheck) {
     meditationFlowCheckState();
+    Serial.println("meditationflow");
   }
   else if(meditation) {
     meditationState();
+    Serial.println("meditation");
   }
   else if(end) {
     endState();
+    Serial.println("end");
   }
 }

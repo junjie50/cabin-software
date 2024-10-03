@@ -1,8 +1,9 @@
 #include "sensor.h"
 
 void Sensor::polling(Orb orb) {
-  static unsigned long prevTime = 0;
-  unsigned long currTime = (millis()/SECOND);
+  static unsigned long prevSecond = 0;
+  unsigned long currSecond= (millis()/SECOND);
+  unsigned long currTime = millis();
   // process data transmission from slave controller
   orb.receiveMessage(bufIn);
 
@@ -20,8 +21,8 @@ void Sensor::polling(Orb orb) {
     }
   }
 
-  if(currTime != prevTime) { // poll every second
-    prevTime = currTime; // prev second recorded
+  if(currSecond != prevSecond) { // poll every second
+    prevSecond = currSecond; // prev second recorded
     if((currTime - prevBeat) < 1100) {
       heartBeatTime++;
       noHeartBeatTime = 0;
