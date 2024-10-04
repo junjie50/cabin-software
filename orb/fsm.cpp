@@ -98,18 +98,23 @@ void Fsm::stateChange() {
     Serial.println(buffer);
     if(strcmp(buffer, "s1") == 0) {
       idleSetUp();
+      Serial.println("idle");
     }
     else if(strcmp(buffer, "s2") == 0) {
       cabinLightOnSetUp();
+      Serial.println("cabinlighton");
     }
     else if(strcmp(buffer, "s3") == 0) {
       meditationFlowCheckSetUp();
+      Serial.println("meditationflow");
     }
     else if(strcmp(buffer, "s4") == 0) {
       meditationSetUp();
+      Serial.println("meditation");
     }
     else if(strcmp(buffer, "s5") == 0) {
       endSetUp();
+      Serial.println("end");
     }
   }
 }
@@ -152,22 +157,17 @@ void Fsm::mainloop() {
   if(idle) {
     // do nothing. controll off
     idleState();
-    Serial.println("idle");
   }
   else if(cabinLightOn) {
     cabinLightOnState();
-    Serial.println("cabinlight");
   }
   else if(meditationFlowCheck) {
     meditationFlowCheckState();
-    Serial.println("meditationflow");
   }
   else if(meditation) {
     meditationState();
-    Serial.println("meditation");
   }
   else if(end) {
     endState();
-    Serial.println("end");
   }
 }
