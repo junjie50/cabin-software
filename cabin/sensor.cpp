@@ -5,7 +5,10 @@ void Sensor::polling(Orb orb) {
   unsigned long currSecond= (millis()/SECOND);
   unsigned long currTime = millis();
   // process data transmission from slave controller
-  orb.receiveMessage(bufIn);
+  orb.receiveMessage();
+  if(orb.messageReady()) {
+    orb.copyAndClearMessage(bufIn);
+  }
 
   // default to 0
   heartBeat = 0;

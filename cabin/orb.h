@@ -10,16 +10,18 @@ class Orb {
 
     void setup();
     void sendMessage(char *msg);
-    void receiveMessage(char *buf);
+    void receiveMessage();
+    void copyAndClearMessage(char *buffer);
+
   private:
-    const int RXPIN = 11;
-    const int TXPIN = 10;
+    const int RXPIN = 18;
+    const int TXPIN = 19;
     char bufIn[15];
     char bufOut[15];
     SoftwareSerial BTSerial{TXPIN, RXPIN}; // RX | TX
     int inWriter = 0;
     int outWriter = 0;
-    bool msgReady = true;
+    bool msgReady = false;
 };
 
 #endif

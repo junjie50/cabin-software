@@ -5,6 +5,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   fsm.setup();
+  delay(2000);
 }
 
 void loop() {

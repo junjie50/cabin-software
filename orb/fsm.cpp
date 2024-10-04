@@ -92,22 +92,25 @@ void Fsm::endState() {
 
 void Fsm::stateChange() {
   // This part receives the update
-  cabin.receiveMessage(buffer);
-
-  if(strcmp(buffer, "s1") == 0) {
-    idleSetUp();
-  }
-  else if(strcmp(buffer, "s2") == 0) {
-    cabinLightOnSetUp();
-  }
-  else if(strcmp(buffer, "s3") == 0) {
-    meditationFlowCheckSetUp();
-  }
-  else if(strcmp(buffer, "s4") == 0) {
-    meditationSetUp();
-  }
-  else if(strcmp(buffer, "s5") == 0) {
-    endSetUp();
+  cabin.receiveMessage();
+  if(cabin.messageReady()) {
+    cabin.copyAndClearMessage(buffer);
+    Serial.println(buffer);
+    if(strcmp(buffer, "s1") == 0) {
+      idleSetUp();
+    }
+    else if(strcmp(buffer, "s2") == 0) {
+      cabinLightOnSetUp();
+    }
+    else if(strcmp(buffer, "s3") == 0) {
+      meditationFlowCheckSetUp();
+    }
+    else if(strcmp(buffer, "s4") == 0) {
+      meditationSetUp();
+    }
+    else if(strcmp(buffer, "s5") == 0) {
+      endSetUp();
+    }
   }
 }
 

@@ -1,32 +1,32 @@
 #include "orb.h"
 
-// GET MESSAGE FUNCTIONS
-bool Orb::messageReady() {
-  return msgReady;
-}
-
-void Orb::getMessage(char *buf) {
-  memcpy(buf, bufIn, strlen(bufIn) + 1);
-}
-
-
 void Orb::setup() {
   BTSerial.begin(38400); // HC-05 default speed in AT command mode is 38400
 }
 
 void Orb::sendMessage(char *msg) {
-  BTSerial.println(msg);
+  BTSerial.write(msg, strlen(msg));
 }
 
-void Orb::receiveMessage(char *buf) {
-  int start = 0;
-  buf[start] = '\0';
-  if(BTSerial.available()) {
-    BTSerial.println("avail");
-    buf[start++] = BTSerial.read();
-    while(BTSerial.available()) {
-      buf[start++] = BTSerial.read();
+void Orb::receiveMessage() {
+  if(BTSerial.available() && !msgReady) {
+    bufIn[inWriter] = BTSerial.read();
+    if(bufIn[inWriter] == '\n') {
+      bufIn[inWriter] = 0;
+      inWriter = 0;
+      msgReady = true; // indicate true to stop writing to it
     }
-    buf[start] = '\n';
+    else {
+      inWriter++;
+    }
   }
+}
+
+void Orb::copyAndClearMessage(char *buffer) {
+  strcpy(buffer, bufIn);
+  msgReady = false;
+}
+
+bool Orb::messageReady(){
+  return msgReady;
 }

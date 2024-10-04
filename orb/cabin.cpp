@@ -5,19 +5,21 @@ void Cabin::setup() {
 }
 
 void Cabin::sendMessage(char *msg) {
-    BTSerial.print(msg);
+    BTSerial.write(msg, strlen(msg));
 }
 
 // Clears the buffer everytime it is being called.
-void Cabin::receiveMessage(char *buf) {
-  int start = 0;
-  buf[start] = '\n';
-  if(BTSerial.available()) {
-    buf[start++] = BTSerial.read();
-    while(BTSerial.available()) {
-      buf[start++] = BTSerial.read();
+void Cabin::receiveMessage() {
+  if(BTSerial.available() && !msgReady) {
+    bufIn[inWriter] = BTSerial.read();
+    if(bufIn[inWriter] == '\n') {
+      bufIn[inWriter] = 0;
+      inWriter = 0;
+      msgReady = true;
     }
-    buf[start] = '\0';
+    else {
+      inWriter++;
+    }
   }
 }
 
