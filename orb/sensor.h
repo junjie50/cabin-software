@@ -1,11 +1,11 @@
 #ifndef sensorClass_h
 #define sensorClass_h
 #include "Arduino.h"
-#include "Constants.h"
 #include "DFRobot_Heartrate.h"
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include "Constants.h"
 #include "cabin.h"
 
 class Sensor {
@@ -15,8 +15,8 @@ class Sensor {
     void polling(Cabin cabin);
 
     // HEART BEAT SENSOR OPERATIONS
-    int getHeartBeat();
     bool heartBeat();
+    bool heartBeatPoll();
     bool noHeartBeatFor(int duration);
 
     // GYRO SENSOR DETECT MOVEMENT
@@ -27,10 +27,9 @@ class Sensor {
 
 
   private:
-    int heartbeat = 0;
+    bool pulse = false;
     DFRobot_Heartrate heartrate{DIGITAL_MODE};
     Adafruit_MPU6050 mpu;
-    bool pulse;
     
     unsigned long prevRecorded = 0;
     unsigned long noHBTime = 0;

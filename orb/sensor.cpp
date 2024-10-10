@@ -24,7 +24,7 @@ void Sensor:: setUp(){
 void Sensor::polling(Cabin cabin) {
   static unsigned long prevSecond = 0;
   static unsigned long prevHB = 0;
-  static unsigned long prevValid = 0;
+  static bool prevValid = false;
   static unsigned long prevPoll = 0;
 
   unsigned long currTimeMilli = millis();
@@ -34,28 +34,16 @@ void Sensor::polling(Cabin cabin) {
   // diff in time from the prev poll
   unsigned long diff = currTimeMilli- prevPoll;
 
+  // PULSE TRACKER
+  // Poll the heartbeat and store in pulse
+  // pulse will change for every cycle
+  pulse = heartBeatPoll();
 
-  int currHeartBeat = 0;
-
-  // Keep collecting the data, if diff is greater than 30, check the sensors for next pulse
-  if(diff > 30) {
-    heartrate.getValue(HEARTRATESENSOR);
-    currHeartBeat = heartrate.getRate();   // A1 foot sampled values
+  // keep a polling tag for pulse
+  if(pulse) {
+    prevValid = true;
+    prevRecorded = currTime;
   }
-
-  // keep recording prev heartrate, if currHeartBeat > 0, pulse is true
-  if(currHeartBeat) {
-    // only poll hr sensor every 30ms, 120 per minute is 50ms interval
-    prevPoll = currTimeMilli;
-    prevValid = currHeartBeat;
-    prevRecorded = currTimeMilli;
-    pulse = true;
-    Serial.println("pulse true");
-  }
-  else{ // reset pulse to false.
-    pulse = false;
-  }
-
 
   // keep track of prev heartbeat incase of no detection every 100ms
   unsigned long remainHB = millis() / 100;
@@ -63,17 +51,14 @@ void Sensor::polling(Cabin cabin) {
     prevHB = remainHB;
     if(prevValid) {
       noHBTime = 0;
-      heartbeat = prevValid; // store the prevValid heartbeat
-      prevValid = 0;
+      prevValid = false; // clear the polling tag for pulse
     }
     else {
       noHBTime++;
-      if(noHBTime == 50) { // 5 s without heartbeat clear heartbeat to 0
-        heartbeat = 0;
-      }
     }
   }
 
+  // MOTION TRACKER
   // motion in this cycle default to false
   motion = false;
   // every second update from gyro
@@ -112,16 +97,64 @@ bool Sensor::controlMoved() {
   return motion;
 }
 
-int Sensor::getHeartBeat() {
-  return heartbeat;
-}
-
 bool Sensor::heartBeat() {
   return pulse;
 }
 
-bool Sensor::noHeartBeatFor(int duration) {
-  unsigned long diff = millis() - prevRecorded;
-  return diff > duration;
+bool Sensor::heartBeatPoll() {
+  static unsigned long detectTime = 0;
+  static unsigned long startTime = 0;
+  static bool pulse = false;
+  static bool stable = false;
+  static int highThreshold = 0;
+  static unsigned int low = 2000;
+  static unsigned int high = 0;
+  static unsigned long monitorTime;
+  static int validHigh = 870;
+  static int validLow = 850;
+
+  unsigned long currTime = millis();
+  int hbreading = analogRead(HEARTRATESENSOR);
+
+  unsigned long timeDiff = currTime - detectTime;
+  if(hbreading > validLow && hbreading < validHigh) { // valid reading
+    if(timeDiff > 4000) { // start of a new detection, set values for calibration
+      low = 2000;
+      high = 0;
+      startTime = currTime;
+      detectTime = currTime;
+      stable = false;
+    }
+    else {
+      unsigned long timeDiffStart = currTime - startTime;
+      if(timeDiffStart > 2500) { // only allow after 500ms to improve the timing
+        if(timeDiffStart <= 3000) { // do the min and high calibration
+        Serial.println("calibrating");
+          low = min(low, hbreading);
+          high = max(high, hbreading);
+        }
+        else if(!stable) { // calculate new threshold
+          highThreshold = (high + low) / 2 + 1;
+          stable = true;
+        }
+        else if(timeDiff > 350 && hbreading > highThreshold) { // not in pulse mode
+          detectTime = currTime;
+          pulse = true;
+        }
+        else { // change pulse to false if prev was pulse or timeDiff < 300;
+          pulse = false;
+        } 
+      }
+    }
+  }
+  else { // not valid value
+    pulse = false;
+  } 
+
+  return pulse;
 }
 
+
+bool Sensor::noHeartBeatFor(int duration) {
+  return (noHBTime / 10) > duration;
+}
