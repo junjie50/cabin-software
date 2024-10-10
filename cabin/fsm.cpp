@@ -10,6 +10,7 @@ void Fsm::resetStates() {
 
 // IDLE STATE
 void Fsm::idleSetUp() {
+  Serial.println("idle");
   resetStates();
   char msg[4] = "s1\n";
   orb.sendMessage(msg);
@@ -30,6 +31,7 @@ void Fsm::idleState() {
 
 
 void Fsm::cabinLightOnSetUp() {
+  Serial.println("light on");
   resetStates();
   char msg[4] = "s2\n";
   orb.sendMessage(msg);
@@ -65,6 +67,7 @@ void Fsm::cabinLightOnState() {
 
 
 void Fsm::meditationFlowCheckSetUp() {
+  Serial.println("meditation flow");
   resetStates();
   char msg[4] = "s3\n";
   orb.sendMessage(msg);
@@ -93,6 +96,7 @@ void Fsm::meditationFlowCheckState() {
 
 
 void Fsm::meditationSetUp() {
+  Serial.println("meditation");
   resetStates();
   char msg[4] = "s4\n";
   orb.sendMessage(msg);
@@ -168,6 +172,7 @@ void Fsm::meditationState() {
 
 
 void Fsm::endSetUp() {
+  Serial.println("end");
   resetStates();
   char msg[4] = "s5\n";
   orb.sendMessage(msg);
@@ -244,10 +249,8 @@ void Fsm::mainloop() {
   }
   else if(meditation) {
     meditationState();
-    Serial.println("meditation");
   }
   else if(end) {
     endState();
-    Serial.println("end");
   }
 }

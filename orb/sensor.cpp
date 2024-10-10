@@ -112,6 +112,7 @@ bool Sensor::heartBeatPoll() {
   static unsigned long monitorTime;
   static int validHigh = 870;
   static int validLow = 850;
+  static int calibrationCount = 0;
 
   unsigned long currTime = millis();
   int hbreading = analogRead(HEARTRATESENSOR);
@@ -124,12 +125,16 @@ bool Sensor::heartBeatPoll() {
       startTime = currTime;
       detectTime = currTime;
       stable = false;
+      calibrationCount = 0;
     }
     else {
       unsigned long timeDiffStart = currTime - startTime;
+      if(calibrationCount == 0) {
+        Serial.println("calibrating");
+        calibrationCount += 1;
+      }
       if(timeDiffStart > 2500) { // only allow after 500ms to improve the timing
         if(timeDiffStart <= 3000) { // do the min and high calibration
-        Serial.println("calibrating");
           low = min(low, hbreading);
           high = max(high, hbreading);
         }
