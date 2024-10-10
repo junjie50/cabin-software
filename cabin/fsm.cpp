@@ -222,30 +222,38 @@ void Fsm::realtime() {
 }
 
 int count = 0;
+char buf[256];
 // main loop
 void Fsm::mainloop() {
   currTime = millis(); // system clock
   // sensor collect data every second and 
   // updates include those from orb if orb has sent hb and fidget
-  sensor.polling(orb);
-  
-  realtime();
+  orb.receiveMessage();
 
-  if(idle) {
-    idleState();
+  if(orb.messageReady()) {
+    orb.copyAndClearMessage(buf);
+    Serial.println(buf);
   }
-  else if(cabinLightOn) {
-    cabinLightOnState();
-  }
-  else if(meditationFlowCheck) {
-    meditationFlowCheckState();
-  }
-  else if(meditation) {
-    meditationState();
-    Serial.println("meditation");
-  }
-  else if(end) {
-    endState();
-    Serial.println("end");
-  }
+
+  // sensor.polling(orb);
+  
+  // realtime();
+
+  // if(idle) {
+  //   idleState();
+  // }
+  // else if(cabinLightOn) {
+  //   cabinLightOnState();
+  // }
+  // else if(meditationFlowCheck) {
+  //   meditationFlowCheckState();
+  // }
+  // else if(meditation) {
+  //   meditationState();
+  //   Serial.println("meditation");
+  // }
+  // else if(end) {
+  //   endState();
+  //   Serial.println("end");
+  // }
 }
