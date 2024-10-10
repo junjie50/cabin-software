@@ -9,7 +9,7 @@ class Light {
     void idleLighting();
     void cabinLighting();
     void meditationFlowCheckLighting(bool start);
-
+    
     void meditationLighting(int heartbeat);
     void meditationNoHBLighting();
 

@@ -209,7 +209,6 @@ void Fsm::setup() {
   diffuser.setup();
   speaker.speakerSetUP(); // set up speaker serial and everything
   light.setup();
-
   idleSetUp();
 }
 
@@ -234,15 +233,12 @@ void Fsm::mainloop() {
 
   if(idle) {
     idleState();
-    Serial.println("idle");
   }
   else if(cabinLightOn) {
     cabinLightOnState();
-    Serial.println("cabinlight");
   }
   else if(meditationFlowCheck) {
     meditationFlowCheckState();
-    Serial.println("meditationflow");
   }
   else if(meditation) {
     meditationState();

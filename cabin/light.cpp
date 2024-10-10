@@ -80,7 +80,7 @@ void Light::meditationLighting(int heartbeat) {
     startTime = currTime;
   }
   unsigned long timeDiff = currTime - startTime;
-  if(timeDiff > interval) { // if not receiving heart beat for a long time.
+  if(timeDiff > interval) { 
     if(timeDiff > TIMEDIFFLIMIT) { // if never receive for too long, go to default human heart beat.
       int remainder = timeDiff % defaultInterval;
       if(remainder > interval) {
