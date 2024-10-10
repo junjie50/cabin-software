@@ -123,14 +123,16 @@ void Fsm::sendEvent() {
   if(sensor.heartBeat()) {
     buffer[0] = 'b';
     buffer[1] = '\n';
-    Serial.println(buffer);
+    buffer[2] = 0;
+    Serial.print(buffer);
     cabin.sendMessage(buffer);
   }
 
   if(sensor.controlMoved()) {
     buffer[0] = 'm';
     buffer[1] = '\n';
-    Serial.println(buffer);
+    buffer[2] = 0;
+    Serial.print(buffer);
     cabin.sendMessage(buffer);
   }
 }
