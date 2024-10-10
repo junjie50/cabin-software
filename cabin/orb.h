@@ -14,8 +14,8 @@ class Orb {
     void copyAndClearMessage(char *buffer);
 
   private:
-    const int RXPIN = 18;
-    const int TXPIN = 19;
+    const int RXPIN = 10;
+    const int TXPIN = 11;
     char bufIn[15] = "";
     char bufOut[15] = "";
     SoftwareSerial BTSerial{TXPIN, RXPIN}; // RX | TX
