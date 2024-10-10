@@ -10,7 +10,7 @@ void Orb::sendMessage(char *msg) {
 
 void Orb::receiveMessage() {
   if(BTSerial.available() && !msgReady) {
-    Serial.println("Received one letter");
+    //Serial.println("Received one letter");
     bufIn[inWriter] = BTSerial.read();
     if(bufIn[inWriter] == '\n') {
       bufIn[inWriter] = 0;

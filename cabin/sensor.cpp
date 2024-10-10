@@ -13,14 +13,14 @@ void Sensor::polling(Orb &orb) {
   // default to 0
   heartBeat = 0;
   fidget = false;
-  
+
   if(strlen(bufIn) > 0) { // if there is something coming in
     if(bufIn[0] == 'b') {
       Serial.println("b");
       heartBeat = 1;
       prevBeat = currTime;
     }
-    else {
+    else if(bufIn[0] == 'm') {
       Serial.println("m");
       fidget = true;
       prevFidget = currTime;
