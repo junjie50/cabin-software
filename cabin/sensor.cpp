@@ -8,6 +8,7 @@ void Sensor::polling(Orb orb) {
   orb.receiveMessage();
   if(orb.messageReady()) {
     orb.copyAndClearMessage(bufIn);
+    Serial.print(bufIn);
   }
 
   // default to 0

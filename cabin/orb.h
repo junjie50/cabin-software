@@ -16,8 +16,8 @@ class Orb {
   private:
     const int RXPIN = 10;
     const int TXPIN = 11;
-    char bufIn[15] = "";
-    char bufOut[15] = "";
+    char bufIn[15];
+    char bufOut[15];
     SoftwareSerial BTSerial{TXPIN, RXPIN}; // RX | TX
     int inWriter = 0;
     int outWriter = 0;
