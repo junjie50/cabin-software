@@ -9,7 +9,7 @@ class Sensor {
   public:
     void setup();
 
-    void polling(Orb orb);
+    void polling(Orb &orb);
 
     bool cabinMotionDetected();
 

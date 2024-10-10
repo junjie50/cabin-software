@@ -1,6 +1,6 @@
 #include "sensor.h"
 
-void Sensor::polling(Orb orb) {
+void Sensor::polling(Orb &orb) {
   static unsigned long prevSecond = 0;
   unsigned long currSecond= (millis()/SECOND);
   unsigned long currTime = millis();
@@ -8,7 +8,6 @@ void Sensor::polling(Orb orb) {
   orb.receiveMessage();
   if(orb.messageReady()) {
     orb.copyAndClearMessage(bufIn);
-    Serial.print(bufIn);
   }
 
   // default to 0
@@ -25,6 +24,7 @@ void Sensor::polling(Orb orb) {
       fidget = true;
       prevFidget = currTime;
     }
+    bufIn[0] = 0;
   }
 
   if(currSecond != prevSecond) { // poll every second
