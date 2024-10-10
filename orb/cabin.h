@@ -2,7 +2,6 @@
 #define cabinClass_h
 #include "Arduino.h"
 #include <SoftwareSerial.h>
-#include <string.h>
 
 class Cabin {
     public:

@@ -5,12 +5,10 @@
 
 class Orb {
   public:
-    bool messageReady();
-    void getMessage(char *buf);
-
     void setup();
     void sendMessage(char *msg);
     void receiveMessage();
+    bool messageReady();
     void copyAndClearMessage(char *buffer);
 
   private:

@@ -124,12 +124,14 @@ void Fsm::sendEvent() {
     char msg[3] = "b\n";
     Serial.print(msg);
     cabin.sendMessage(msg);
+    Serial.println("sent");
   }
 
   if(sensor.controlMoved()) {
     char msg[3] = "m\n";
     Serial.print(msg);
     cabin.sendMessage(msg);
+    Serial.println("sent");
   }
 }
 
