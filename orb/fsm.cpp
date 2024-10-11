@@ -122,13 +122,11 @@ void Fsm::stateChange() {
 void Fsm::sendEvent() {
   if(sensor.heartBeat()) {
     char msg[3] = "b\n";
-    Serial.print(msg);
     cabin.sendMessage(msg);
   }
 
   if(sensor.controlMoved()) {
     char msg[3] = "m\n";
-    Serial.print(msg);
     cabin.sendMessage(msg);
   }
 }

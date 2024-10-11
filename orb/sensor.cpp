@@ -110,7 +110,7 @@ bool Sensor::heartBeatPoll() {
   static unsigned int low = 2000;
   static unsigned int high = 0;
   static unsigned long monitorTime;
-  static int validHigh = 870;
+  static int validHigh = 872;
   static int validLow = 850;
   static int calibrationCount = 0;
 
@@ -139,10 +139,10 @@ bool Sensor::heartBeatPoll() {
           high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = (high + low) / 2 + 1;
+          highThreshold = (high + low + 1) / 2;
           stable = true;
         }
-        else if(timeDiff > 350 && hbreading > highThreshold) { // not in pulse mode
+        else if(timeDiff > 400 && hbreading > highThreshold) { // not in pulse mode
           detectTime = currTime;
           pulse = true;
         }
