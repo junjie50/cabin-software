@@ -96,16 +96,16 @@ void Fsm::meditationFlowCheckState() {
 
 
 void Fsm::meditationSetUp() {
-  Serial.println("meditation");
   resetStates();
   char msg[4] = "s4\n";
   orb.sendMessage(msg);
-  speaker.speakerReset();
+  // speaker.speakerReset();
   diffuserStartTime = millis();
   diffuserStart = true;
   meditation = true;
   fidget = false;
   heartbeat = true;
+  Serial.println("meditation");
 }
 
 void Fsm::meditationExit() {
@@ -119,15 +119,15 @@ void Fsm::meditationState() {
   // state with ligting system according to the heartbeat that is recorded every second
   light.meditationLighting(sensor.getHeartBeat());
 
-  // additional speaker
-  if(fidget){
-    speaker.fidgetStateSpeaker(fidgetStartTime);
-  }
-  else {
-    speaker.speaker2Stop(); 
-  }
+  // // additional speaker
+  // if(fidget){
+  //   speaker.fidgetStateSpeaker(fidgetStartTime);
+  // }
+  // else {
+  //   speaker.speaker2Stop(); 
+  // }
 
-  speaker.meditationSpeaker();
+  // speaker.meditationSpeaker();
 
   // State changes
   if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
