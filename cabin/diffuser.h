@@ -1,7 +1,6 @@
 #ifndef diffuserClass_h
 #define diffuserClass_h
 #include "Arduino.h"
-#include "Constants.h"
 
 class Diffuser {
   public:

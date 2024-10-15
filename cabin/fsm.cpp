@@ -110,8 +110,6 @@ void Fsm::meditationSetUp() {
 }
 
 void Fsm::meditationExit() {
-  speaker.speaker1Stop();
-  speaker.speaker2Stop();
   diffuserEndTime = millis();
   diffuserStart = false;
 }
@@ -124,6 +122,8 @@ void Fsm::meditationState() {
 
   // State changes
   if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
+    speaker.speaker1Stop();
+    speaker.speaker2Stop();
     meditationExit();
     cabinLightOnSetUp();
   }
@@ -162,10 +162,8 @@ void Fsm::meditationState() {
 
 
 
-
 void Fsm::endSetUp() {
   Serial.println("end");
-  speaker.speaker1Continue();
   endStart = currTime;
   resetStates();
   char msg[4] = "s5\n";
@@ -173,23 +171,18 @@ void Fsm::endSetUp() {
   end = true;
 }
 
-
-void Fsm::endExit() {
-  speaker.speaker1Stop();
-}
-
 void Fsm::endState() {
   static unsigned long duration = 30000;
-  static unsigned long timeToLeave = 20000;
+  static unsigned long timeToLeave = 10000;
   light.endLighting();
   unsigned long timeDiff = currTime - endStart;
   if(timeDiff > timeToLeave) { // give people time to react
     if(sensor.chairPressureNotDetected(ENDNOPRESSURE)) { // never detect chair for 5 seconds to exit state
-      endExit();
+      speaker.speaker1Stop();
+      speaker.speaker2Stop();
       cabinLightOnSetUp();
     }
     else if(sensor.chairPressureDetected(ENDPRESSUREDETECTED)) { // has been sitting for the pass 1 minute, continue with meditation.
-      endExit();
       meditationSetUp();
     }
   }
