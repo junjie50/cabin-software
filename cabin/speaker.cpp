@@ -1,21 +1,31 @@
 #include "speaker.h"
 
 void Speaker::speakerSetUP() {
-  SPEAKER1SERIAL.begin(115200);
-  SPEAKER2SERIAL.begin(115200);
-  while(!player1.begin(SPEAKER1SERIAL)) {
+  Serial1.begin(115200);
+  Serial2.begin(115200);
+  
+  while(!player1.begin(Serial1)) {
     Serial.println("Init failed speaker1, please check the wire connection!");
     delay(1000);
   }
-  while(!player2.begin(SPEAKER2SERIAL)) {
+
+  while(!player2.begin(Serial2)) {
     Serial.println("Init failed speaker2, please check the wire connection!");
     delay(1000);
   }
-  Serial.println(F("DFPlayer Mini online."));
   
-  player1.setVol(5);  //Set volume value. From 0 to 30
-  player2.setVol(5);  //Set volume value. From 0 to 30
-  player1.start();
+  player1.setVol(25);  //Set volume value. From 0 to 30
+  player2.setVol(25);  //Set volume value. From 0 to 30
+
+  // enter music mode
+  player1.switchFunction(player1.MUSIC);
+  player2.switchFunction(player2.MUSIC);
+  player1.setPlayMode(player1.SINGLE);
+  player2.setPlayMode(player2.SINGLE);
+  
+  player1.pause();
+  player2.pause();
+  Serial.println(F("DFPlayer Mini online."));
 }
 
 void Speaker::speakerReset() {
@@ -23,23 +33,16 @@ void Speaker::speakerReset() {
 }
 
 void Speaker::speaker1Stop() {
-  if(player1.isPlaying()){
-    player1.pause();
-  }
+  player1.pause();
 }
 
 void Speaker::speaker2Stop() {
-  if(player2.isPlaying()) {
-    player2.pause();
-  }
+  player2.pause();
 }
 
 // after count it wil; not auto player
 void Speaker::meditationSpeaker() {
-  if(!player1.isPlaying()){
-    loopedCount1++;
-    player1.playFileNum(1);
-  }
+  player1.playFileNum(1);
 }
 
 int Speaker::getLoopedTimes() {

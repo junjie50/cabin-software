@@ -99,8 +99,9 @@ void Fsm::meditationSetUp() {
   resetStates();
   char msg[4] = "s4\n";
   orb.sendMessage(msg);
-  // speaker.speakerReset();
-  diffuserStartTime = millis();
+  speaker.meditationSpeaker();
+  meditationStart  = currTime;
+  diffuserStartTime = currTime;
   diffuserStart = true;
   meditation = true;
   fidget = false;
@@ -109,32 +110,22 @@ void Fsm::meditationSetUp() {
 }
 
 void Fsm::meditationExit() {
-  speaker.speaker2Stop();
-  speaker.speaker1Stop();
   diffuserEndTime = millis();
   diffuserStart = false;
 }
 
 void Fsm::meditationState() {
+  static unsigned long duration = 30000;
   // state with ligting system according to the heartbeat that is recorded every second
+  unsigned long diff = currTime - meditationStart;
   light.meditationLighting(sensor.getHeartBeat());
-
-  // // additional speaker
-  // if(fidget){
-  //   speaker.fidgetStateSpeaker(fidgetStartTime);
-  // }
-  // else {
-  //   speaker.speaker2Stop(); 
-  // }
-
-  // speaker.meditationSpeaker();
 
   // State changes
   if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
     meditationExit();
     cabinLightOnSetUp();
   }
-  else if(speaker.getLoopedTimes() == SPEAKERLOOPCOUNTMINUSONE) {
+  else if(diff > duration) {
     meditationExit();
     endSetUp();
   }
@@ -170,9 +161,9 @@ void Fsm::meditationState() {
 
 
 
-
 void Fsm::endSetUp() {
   Serial.println("end");
+  endStart = currTime;
   resetStates();
   char msg[4] = "s5\n";
   orb.sendMessage(msg);
@@ -185,12 +176,11 @@ void Fsm::endExit() {
   speaker.speaker2Stop();
 }
 
-
 void Fsm::endState() {
+  static unsigned long duration = 15000;
   light.endLighting();
-  speaker.endStateSpeaker();
-
-  if(speaker.getLoopedTimes() >= SPEAKERLOOPCOUNT && sensor.chairPressureNotDetected(ENDNOPRESSURE)) {
+  unsigned long timeDiff = currTime - endStart;
+  if(timeDiff >= duration && sensor.chairPressureNotDetected(ENDNOPRESSURE)) {
     endExit();
     cabinLightOnSetUp();
   } 

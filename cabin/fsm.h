@@ -51,6 +51,7 @@ class Fsm {
     unsigned long cabinLightOnStartTime;
 
     // meditation
+    unsigned long meditationStart;
     bool meditation = false;
     bool fidget = false;
     unsigned long fidgetStartTime;
@@ -58,6 +59,8 @@ class Fsm {
 
     // end
     bool end = false;
+    unsigned long endStart;
+
 
     // diffuser
     bool diffuserStart = false;
