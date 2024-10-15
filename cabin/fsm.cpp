@@ -121,13 +121,13 @@ void Fsm::meditationState() {
   light.meditationLighting(sensor.getHeartBeat());
 
   // State changes
-  if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) {
+  if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) { // go to cabin
     speaker.speaker1Stop();
     speaker.speaker2Stop();
     meditationExit();
     cabinLightOnSetUp();
   }
-  else if(diff > duration) {
+  else if(diff > duration) { // go to end state
     meditationExit();
     endSetUp();
   }
