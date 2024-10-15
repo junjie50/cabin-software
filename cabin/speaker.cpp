@@ -14,8 +14,8 @@ void Speaker::speakerSetUP() {
     delay(1000);
   }
   
-  player1.setVol(25);  //Set volume value. From 0 to 30
-  player2.setVol(25);  //Set volume value. From 0 to 30
+  player1.setVol(10);  //Set volume value. From 0 to 30
+  player2.setVol(10);  //Set volume value. From 0 to 30
 
   // enter music mode
   player1.switchFunction(player1.MUSIC);
@@ -34,6 +34,10 @@ void Speaker::speakerReset() {
 
 void Speaker::speaker1Stop() {
   player1.pause();
+}
+
+void Speaker::speaker1Continue(){
+  player1.start();
 }
 
 void Speaker::speaker2Stop() {

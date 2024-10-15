@@ -83,7 +83,6 @@ bool Sensor::fidgetDetected(int time) {
 
 
 
-
 bool Sensor::chairPressureHigh() {
   return analogRead(PRESSUREPIN) > PRESSUREHIGH;
 }
