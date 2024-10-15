@@ -67,8 +67,8 @@ void Light::meditationFlowCheckLighting(bool start) {
 
 void Light::meditationLighting(int heartbeat) {
   static unsigned long time = millis();
-  static unsigned int interval = 300;
-  static unsigned int half = 150;
+  static unsigned int interval = 350;
+  static unsigned int half = 175;
   static unsigned long startTime = 0;
   static unsigned long TIMEDIFFLIMIT = 2000;
   static unsigned long defaultInterval = 60000/AVGHEARTBEAT;

@@ -179,8 +179,8 @@ void Fsm::endExit() {
 }
 
 void Fsm::endState() {
-  static unsigned long duration = 25000;
-  static unsigned long timeToLeave = 15000;
+  static unsigned long duration = 30000;
+  static unsigned long timeToLeave = 20000;
   light.endLighting();
   unsigned long timeDiff = currTime - endStart;
   if(timeDiff > timeToLeave) { // give people time to react
@@ -194,7 +194,6 @@ void Fsm::endState() {
     }
   }
 }
-
 
 
 
