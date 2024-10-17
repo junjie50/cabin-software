@@ -4,15 +4,25 @@ void Diffuser::setup() {
   pinMode(DIFFUSERPIN, OUTPUT);
 }
 
-void Diffuser::trigger(unsigned long startTime) {
+void Diffuser::trigger(unsigned long startTime, bool start) {
   unsigned long interval = millis() - startTime;
-  if(interval < DIFFUSERDELAY) {
-    return;
+  if(start) {
+    if(interval < DIFFUSERDELAY) {
+      return;
+    }
+    else if(interval < DIFFUSERDELAYTRIGGER) {
+      digitalWrite(DIFFUSERPIN, HIGH);
+    }
+    else{
+      digitalWrite(DIFFUSERPIN, LOW);
+    }
   }
-  else if(interval < DIFFUSERDELAYTRIGGER) {
-    digitalWrite(DIFFUSERPIN, HIGH);
-  }
-  else{
-    digitalWrite(DIFFUSERPIN, LOW);
+  else {
+    if(interval < 500) {
+      digitalWrite(DIFFUSERPIN, HIGH);
+    }
+    else{
+      digitalWrite(DIFFUSERPIN, LOW);
+    }
   }
 }

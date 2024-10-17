@@ -213,10 +213,10 @@ void Fsm::setup() {
 
 void Fsm::realtime() {
   if(diffuserStart) {
-    diffuser.trigger(diffuserStartTime);
+    diffuser.trigger(diffuserStartTime, true);
   }
   else {
-    diffuser.trigger(diffuserEndTime);
+    diffuser.trigger(diffuserEndTime, false);
   }
 }
 

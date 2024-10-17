@@ -6,7 +6,7 @@
 class Diffuser {
   public:
     void setup();
-    void trigger(unsigned long startTime);
+    void trigger(unsigned long startTime, bool start);
   private:
 };
 
