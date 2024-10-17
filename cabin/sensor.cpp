@@ -50,8 +50,10 @@ void Sensor::polling(Orb &orb) {
 
     if((currTime - prevFidget) < 1100) {
       fidgetTime++;
+      noFidgetTime = 0;
     }
     else{
+      fidgetTime = 0;
       noFidgetTime++;
     }
   }
