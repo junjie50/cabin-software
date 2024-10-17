@@ -89,8 +89,9 @@ void Speaker::fidgetSpeakerStart() {
 void Speaker::fidgetStateSpeaker(unsigned long startTime) {
   static int prevVolume = SPEAKER2STARTVOL;
   unsigned long currTime = millis();
-  int volume = min(SPEAKER2MAXVOLUME, SPEAKER2STARTVOL + (startTime - currTime) / SECOND  / 5);
+  int volume = min(SPEAKER2MAXVOLUME, SPEAKER2STARTVOL + (startTime - currTime) / SECOND  / 3);
   if(prevVolume != volume){
+    Serial.println("Increased volume");
     prevVolume = volume;
     player2.setVol(volume);
   }

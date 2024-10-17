@@ -115,7 +115,7 @@ void Fsm::meditationExit() {
 }
 
 void Fsm::meditationState() {
-  static unsigned long duration = 30000;
+  static unsigned long duration = 300000;
   // state with ligting system according to the heartbeat that is recorded every second
   unsigned long diff = currTime - meditationStart;
   light.meditationLighting(sensor.getHeartBeat());
@@ -146,10 +146,12 @@ void Fsm::meditationState() {
       if(sensor.fidgetDetected(FIDGETDETECTTIME)) {
         fidget = true;
         fidgetStartTime = currTime;
+        Serial.println("speaker started");
         speaker.fidgetSpeakerStart();
       }
     }
     else if(sensor.fidgetNotDetected(FIDGETDETECTTIME)) {
+      Serial.println("fidget stopped");
       fidget = false;
       speaker.speaker2Stop();
     }
