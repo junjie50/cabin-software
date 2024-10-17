@@ -14,17 +14,35 @@ void Speaker::speakerSetUP() {
     delay(1000);
   }
   
-  player1.setVol(30);  //Set volume value. From 0 to 30
-  player2.setVol(30);  //Set volume value. From 0 to 30
+  player1.setVol(25);  //Set volume value. From 0 to 30
+  player2.setVol(25);  //Set volume value. From 0 to 30
 
-  // enter music mode
+    // enter music mode
   player1.switchFunction(player1.MUSIC);
   player2.switchFunction(player2.MUSIC);
   player1.setPlayMode(player1.SINGLE);
   player2.setPlayMode(player2.SINGLE);
-  
+
+  delay(500);
+
+  player1.playFileNum(1);
+  delay(100);
   player1.pause();
+  delay(100);
+  player1.playFileNum(1);
+  delay(100);
+  player1.pause();
+  delay(100);
+
+  player2.playFileNum(1);
+  delay(100);
   player2.pause();
+  delay(100);
+  player2.playFileNum(1);
+  delay(100);
+  player2.pause();
+  delay(100);
+
   Serial.println(F("DFPlayer Mini online."));
 }
 
