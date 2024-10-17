@@ -18,4 +18,4 @@
 // BUZZER
 #define BUZZERPIN 9
 #define BUZZERINTERVAL 1000
-#define BUZZERPOWER 80 // range 80 - 255
+#define BUZZERPOWER 200 // range 80 - 255

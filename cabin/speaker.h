@@ -24,5 +24,4 @@ class Speaker {
     int loopedCount2 = 0;
     int player2Vol = 10;
 };
-
 #endif
