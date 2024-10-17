@@ -189,10 +189,52 @@ void Light::offChair() {
   analogWrite(LIGHTCHAIR, 0);
 }
 
+void Light::baseLighting(bool item) {
+  static unsigned int interval = 1000;
+  static unsigned int half = 500;
+  if(!item) {
+    unsigned long time = millis();
+    double remainder = time % interval;
+    if(remainder > half) {
+      remainder = interval - remainder;
+    }
+    int brightness = remainder / (double)half * MAXBRIGHTNESS;
+    setBrightness(brightness);
+  }
+  else {
+    setBrightness(0);
+  }
+  update();
+}
+
+// Set the brightness of the LED
+void Light::setBrightness(int brightness) {
+  FastLED.setBrightness(brightness);
+}
+
+void Light::clearLight() {
+  FastLED.clear(true);
+}
+
+void Light::setColour(CRGB colour) {
+  fill_solid(leds, NUMLEDS, colour);
+}
+
+void Light::update() {
+  FastLED.show();
+}
+
 void Light::setup() {
   pinMode(LIGHTFRONT, OUTPUT);
   pinMode(LIGHTLEFT, OUTPUT);
   pinMode(LIGHTRIGHT, OUTPUT);
   pinMode(LIGHTBACK, OUTPUT);
+
+  FastLED.addLeds<WS2812, LEDPIN, GRB>(leds, NUMLEDS);
+  setColour(0x33ff33);
+  clearLight();
+  update();
 }
+
+
 

@@ -105,8 +105,13 @@ int Sensor::getHeartBeat() {
   return heartBeat;
 }
 
+bool Sensor::itemInBase() {
+  return digitalRead(CONTACTPIN) == LOW;
+}
+
 void Sensor::setup() {
   pinMode(PIRPIN, INPUT); // set up PIR sensor
+  pinMode(CONTACTPIN, INPUT_PULLUP); // set up PIR sensor
 }
 
 

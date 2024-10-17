@@ -2,6 +2,7 @@
 #define lightClass_h
 #include "Arduino.h"
 #include "Constants.h"
+#include <FastLED.h>
 
 
 class Light {
@@ -24,6 +25,15 @@ class Light {
     void lightChair(int power);
     void offChair();
     void setup();
+
+    // base control
+    void baseLighting(bool item);
+    // Set the brightness of the LED
+    void setBrightness(int brightness);
+    void clearLight();
+    void setColour(CRGB colour);
+    void update();
+    
   private:
     int idleLight = 0;
     const int frontind = 0;
@@ -31,5 +41,7 @@ class Light {
     const int backind = 2;
     const int rightind = 3;
     int brightness[4] = {0, 0, 0, 0};
+
+    CRGB leds[NUMLEDS];
 };
 #endif

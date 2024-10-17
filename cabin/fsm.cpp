@@ -115,7 +115,7 @@ void Fsm::meditationExit() {
 }
 
 void Fsm::meditationState() {
-  static unsigned long duration = 300000;
+  static unsigned long duration = 30000;
   // state with ligting system according to the heartbeat that is recorded every second
   unsigned long diff = currTime - meditationStart;
   light.meditationLighting(sensor.getHeartBeat());
@@ -182,7 +182,7 @@ void Fsm::endState() {
   light.endLighting();
   unsigned long timeDiff = currTime - endStart;
   if(timeDiff > timeToLeave) { // give people time to react
-    if(sensor.chairPressureNotDetected(ENDNOPRESSURE)) { // never detect chair for 5 seconds to exit state
+    if(sensor.chairPressureNotDetected(ENDNOPRESSURE) && !sensor.itemInBase()) { // never detect chair for 5 seconds to exit state
       speaker.speaker1Stop();
       speaker.speaker2Stop();
       cabinLightOnSetUp();
@@ -191,6 +191,8 @@ void Fsm::endState() {
       meditationSetUp();
     }
   }
+
+  light.baseLighting(sensor.itemInBase());
 }
 
 

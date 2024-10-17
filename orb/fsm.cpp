@@ -90,29 +90,39 @@ void Fsm::endState() {
   return;
 }
 
+bool compareString(char *s1, char *s2) {
+  int minLength = min(strlen(s1), strlen(s2));
+  for(int i = 0; i < minLength; i++) {
+    if(s1[i] != s2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 void Fsm::stateChange() {
   // This part receives the update
   cabin.receiveMessage();
   if(cabin.messageReady()) {
     cabin.copyAndClearMessage(buffer);
     Serial.println(buffer);
-    if(strcmp(buffer, "s1") == 0) {
+    if(compareString(buffer, "s1") == 0) {
       idleSetUp();
       Serial.println("idle");
     }
-    else if(strcmp(buffer, "s2") == 0) {
+    else if(compareString(buffer, "s2") == 0) {
       cabinLightOnSetUp();
       Serial.println("cabinlighton");
     }
-    else if(strcmp(buffer, "s3") == 0) {
+    else if(compareString(buffer, "s3") == 0) {
       meditationFlowCheckSetUp();
       Serial.println("meditationflow");
     }
-    else if(strcmp(buffer, "s4") == 0) {
+    else if(compareString(buffer, "s4") == 0) {
       meditationSetUp();
       Serial.println("meditation");
     }
-    else if(strcmp(buffer, "s5") == 0) {
+    else if(compareString(buffer, "s5") == 0) {
       endSetUp();
       Serial.println("end");
     }

@@ -12,7 +12,14 @@ void Cabin::sendMessage(char *msg) {
 void Cabin::receiveMessage() {
   if(BTSerial.available() && !msgReady) {
     bufIn[inWriter] = BTSerial.read();
-    if(bufIn[inWriter] == '\n') {
+    if(inWriter == 0 && bufIn[inWriter] != 's'){ // invalid first character
+      if(bufIn[inWriter] > '0' && bufIn[inWriter] <= '5'){
+        bufIn[1] = bufIn[0];
+        bufIn[0] = 's';
+        inWriter = 2;
+      }
+    }
+    else if(bufIn[inWriter] == '\n') {
       bufIn[inWriter] = 0;
       inWriter = 0;
       msgReady = true;

@@ -36,6 +36,8 @@ class Sensor {
 
     bool fidgetHigh();
 
+    bool itemInBase();
+
 
   private:
     // Record our own heartbeat as it is tracked by another processor

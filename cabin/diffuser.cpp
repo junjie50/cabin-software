@@ -1,15 +1,18 @@
 #include "diffuser.h"
 
 void Diffuser::setup() {
-  pinMode(51, OUTPUT);
+  pinMode(DIFFUSERPIN, OUTPUT);
 }
 
 void Diffuser::trigger(unsigned long startTime) {
   unsigned long interval = millis() - startTime;
-  if(interval < 500) {
-    digitalWrite(51, HIGH);
+  if(interval < DIFFUSERDELAY) {
+    return;
+  }
+  else if(interval < DIFFUSERDELAYTRIGGER) {
+    digitalWrite(DIFFUSERPIN, HIGH);
   }
   else{
-    digitalWrite(51, LOW);
+    digitalWrite(DIFFUSERPIN, LOW);
   }
 }

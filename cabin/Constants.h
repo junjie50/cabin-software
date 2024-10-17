@@ -54,7 +54,17 @@
 
 // DIFFUSER PIN
 #define DIFFUSERPIN 51
+#define DIFFUSERDELAY 5000
+#define DIFFUSERDELAYTRIGGER 5500
 
+
+// LED RING
+#define LEDPIN 46
+#define NUMLEDS 12
+#define MAXBRIGHTNESS 40
+
+// Contact sensor
+#define CONTACTPIN 47
 
 
 
