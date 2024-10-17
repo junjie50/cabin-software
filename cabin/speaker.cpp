@@ -81,14 +81,16 @@ void Speaker::fidgetStateSpeakerSetUp() {
   player2.setVol(SPEAKER2STARTVOL);
 }
 
+void Speaker::fidgetSpeakerStart() {
+  player2.setVol(SPEAKER2STARTVOL);
+  player2.playFileNum(1);
+}
+
 void Speaker::fidgetStateSpeaker(unsigned long startTime) {
   static int prevVolume = SPEAKER2STARTVOL;
   unsigned long currTime = millis();
   int volume = min(SPEAKER2MAXVOLUME, SPEAKER2STARTVOL + (startTime - currTime) / SECOND  / 5);
-  if(!player2.isPlaying()) {
-     player2.playFileNum(1);
-  }
-  else if(prevVolume != volume){
+  if(prevVolume != volume){
     prevVolume = volume;
     player2.setVol(volume);
   }

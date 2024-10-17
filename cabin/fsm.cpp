@@ -146,12 +146,15 @@ void Fsm::meditationState() {
       if(sensor.fidgetDetected(FIDGETDETECTTIME)) {
         fidget = true;
         fidgetStartTime = currTime;
+        speaker.fidgetSpeakerStart();
       }
     }
-    else if ((currTime - fidgetStartTime) / SECOND > 5){ // no fidget for more than 5 seconds
-      if(!sensor.fidgetDetected(FIDGETDETECTTIME)) {
-        fidget = false;
-      }
+    else if(sensor.fidgetNotDetected(FIDGETDETECTTIME)) {
+      fidget = false;
+      speaker.speaker2Stop();
+    }
+    else{
+      speaker.fidgetStateSpeaker(fidgetStartTime); // change the volume
     }
   }
 }

@@ -52,7 +52,7 @@ void Sensor::polling(Orb &orb) {
       fidgetTime++;
     }
     else{
-      fidgetTime = 0;
+      noFidgetTime++;
     }
   }
 }
@@ -79,6 +79,10 @@ bool Sensor::heartBeatNotDetected(int time) {
 
 bool Sensor::fidgetDetected(int time) {
   return fidgetTime >= time;
+}
+
+bool Sensor::fidgetNotDetected(int time) {
+  return noFidgetTime >= time;
 }
 
 

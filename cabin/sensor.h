@@ -23,6 +23,9 @@ class Sensor {
 
     bool fidgetDetected(int time);
 
+
+    bool fidgetNotDetected(int time);
+
     int getHeartBeat();
 
 
@@ -50,6 +53,7 @@ class Sensor {
     int heartBeatTime = 0;
     int noHeartBeatTime = 0;
     int fidgetTime = 0;
+    int noFidgetTime = 0;
 
     // buffer for message
     char bufIn[15];
