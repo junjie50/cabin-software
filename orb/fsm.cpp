@@ -115,23 +115,23 @@ void Fsm::stateChange() {
   if(cabin.messageReady()) {
     cabin.copyAndClearMessage(buffer);
     Serial.println(buffer);
-    if(compareString(buffer, "s1") == 0) {
+    if(compareString(buffer, "s1")) {
       idleSetUp();
       Serial.println("idle");
     }
-    else if(compareString(buffer, "s2") == 0) {
+    else if(compareString(buffer, "s2")) {
       cabinLightOnSetUp();
       Serial.println("cabinlighton");
     }
-    else if(compareString(buffer, "s3") == 0) {
+    else if(compareString(buffer, "s3")) {
       meditationFlowCheckSetUp();
       Serial.println("meditationflow");
     }
-    else if(compareString(buffer, "s4") == 0) {
+    else if(compareString(buffer, "s4")) {
       meditationSetUp();
       Serial.println("meditation");
     }
-    else if(compareString(buffer, "s5") == 0) {
+    else if(compareString(buffer, "s5")) {
       endSetUp();
       Serial.println("end");
     }
