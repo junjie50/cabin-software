@@ -138,7 +138,7 @@ bool Sensor::heartBeatPoll() {
           high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = (high + low) / 2 + 2;
+          highThreshold = ((high + low)) / 2 + 3;
           stable = true;
         }
         else if(timeDiff > 400 && hbreading > highThreshold) { // not in pulse mode

@@ -15,6 +15,7 @@ void Fsm::idleSetUp() {
   char msg[4] = "s1\n";
   orb.sendMessage(msg);
   idle = true;
+  msgCount = 0;
 }
 
 void Fsm::idleState() {
@@ -27,6 +28,13 @@ void Fsm::idleState() {
   else if(sensor.chairPressureDetected(CHAIRDETECTTIME)) {
     meditationFlowCheckSetUp();
   }
+
+
+  // repeat blueooth state change message
+  if(msgCount < 2) {
+    orb.sendMessage("s1\n");
+    msgCount++;
+  }
 }
 
 
@@ -37,6 +45,7 @@ void Fsm::cabinLightOnSetUp() {
   orb.sendMessage(msg);
   cabinLightOn = true;
   cabinLightOnStartTime = currTime;
+  msgCount = 0;
 }
 
 // cabinLightOnState
@@ -58,6 +67,12 @@ void Fsm::cabinLightOnState() {
   else if(sensor.chairPressureDetected(CHAIRDETECTTIME)) {
     meditationFlowCheckSetUp();
   }
+
+  // repeat blueooth state change message
+  if(msgCount < 2) {
+    orb.sendMessage("s2\n");
+    msgCount++;
+  }
 }
 
 
@@ -71,6 +86,7 @@ void Fsm::meditationFlowCheckSetUp() {
   orb.sendMessage(msg);
   light.meditationFlowCheckLighting(true);
   meditationFlowCheck = true;
+  msgCount = 0;
 }
 
 void Fsm::meditationFlowCheckState() {
@@ -83,6 +99,13 @@ void Fsm::meditationFlowCheckState() {
   else if(sensor.heartBeatDetected(HEARTBEATDETECTTIME)) {
     // if heartbeat detected for some time, go to meditation state
     meditationSetUp();
+  }
+
+
+    // repeat blueooth state change message
+  if(msgCount < 2) {
+    orb.sendMessage("s3\n");
+    msgCount++;
   }
 }
 
@@ -105,6 +128,7 @@ void Fsm::meditationSetUp() {
   fidget = false;
   heartbeat = true;
   Serial.println("meditation");
+  msgCount = 0;
 }
 
 void Fsm::meditationExit() {
@@ -157,6 +181,12 @@ void Fsm::meditationState() {
       speaker.fidgetStateSpeaker(fidgetStartTime); // change the volume
     }
   }
+
+      // repeat blueooth state change message
+  if(msgCount < 2) {
+    orb.sendMessage("s4\n");
+    msgCount++;
+  }
 }
 
 
@@ -172,6 +202,7 @@ void Fsm::endSetUp() {
   char msg[4] = "s5\n";
   orb.sendMessage(msg);
   end = true;
+  msgCount = 0;
 }
 
 void Fsm::endState() {
@@ -185,11 +216,17 @@ void Fsm::endState() {
       cabinLightOnSetUp(); // go to light on state
     }
     else if(sensor.chairPressureDetected(ENDPRESSUREDETECTED)) { // has been sitting for the pass 1 minute, continue with meditation.
+      light.baseOff(); // turn off the base light
       meditationSetUp();
     }
   }
 
   light.baseLighting(sensor.itemInBase()); // once item in base, base will turn off
+        // repeat blueooth state change message
+  if(msgCount < 2) {
+    orb.sendMessage("s5\n");
+    msgCount++;
+  }
 }
 
 

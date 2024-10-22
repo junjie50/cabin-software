@@ -42,6 +42,7 @@ class Fsm {
     //State management
     bool idle = true;
     unsigned long currTime;
+    int msgCount = 0;
 
     // meditationFlowCheckState
     bool meditationFlowCheck = false;
