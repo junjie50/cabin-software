@@ -192,6 +192,7 @@ void Light::offChair() {
 void Light::baseLighting(bool item) {
   static unsigned int interval = 1000;
   static unsigned int half = 500;
+  setColour(0x33ff33);
   if(!item) {
     unsigned long time = millis();
     double remainder = time % interval;
@@ -205,6 +206,10 @@ void Light::baseLighting(bool item) {
     setBrightness(0);
   }
   update();
+}
+
+void Light::baseOff() {
+  clearLight();
 }
 
 // Set the brightness of the LED
@@ -235,6 +240,5 @@ void Light::setup() {
   clearLight();
   update();
 }
-
 
 

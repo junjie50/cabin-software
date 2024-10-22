@@ -84,7 +84,7 @@ void Light::beatOnce(bool heartBeat) {
   else if(diff > BEATINTERVALHALF) {
     double remainder = (double)(BEATINTERVAL - diff) / BEATINTERVALHALF ;
     brightness = remainder * MAXBRIGHTNESS;
-  }
+  }w
   else {
     double remainder = (double)diff / BEATINTERVALHALF ;
     brightness = remainder * MAXBRIGHTNESS;

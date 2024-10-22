@@ -18,7 +18,6 @@ void Sensor:: setUp(){
   mpu.setMotionInterrupt(true);
 
   pinMode(BUZZERPIN,OUTPUT);    // Set the digital pin(9) as output
-  delay(20);
 }
 
 void Sensor::polling(Cabin cabin) {

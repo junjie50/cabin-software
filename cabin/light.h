@@ -28,12 +28,13 @@ class Light {
 
     // base control
     void baseLighting(bool item);
+    void baseOff();
     // Set the brightness of the LED
     void setBrightness(int brightness);
     void clearLight();
     void setColour(CRGB colour);
     void update();
-    
+
   private:
     int idleLight = 0;
     const int frontind = 0;

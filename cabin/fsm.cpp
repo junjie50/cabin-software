@@ -64,8 +64,6 @@ void Fsm::cabinLightOnState() {
 
 
 
-
-
 void Fsm::meditationFlowCheckSetUp() {
   Serial.println("meditation flow");
   resetStates();
@@ -110,6 +108,8 @@ void Fsm::meditationSetUp() {
 }
 
 void Fsm::meditationExit() {
+  speaker.speaker1Stop();
+  speaker.speaker2Stop();
   diffuserEndTime = millis();
   diffuserStart = false;
 }
@@ -122,8 +122,6 @@ void Fsm::meditationState() {
 
   // State changes
   if(sensor.chairPressureNotDetected(MEDITATIONNODETECTTIME) && sensor.heartBeatNotDetected(MEDITATIONNODETECTTIME)) { // go to cabin
-    speaker.speaker1Stop();
-    speaker.speaker2Stop();
     meditationExit();
     cabinLightOnSetUp();
   }
@@ -182,17 +180,16 @@ void Fsm::endState() {
   light.endLighting();
   unsigned long timeDiff = currTime - endStart;
   if(timeDiff > timeToLeave) { // give people time to react
-    if(sensor.chairPressureNotDetected(ENDNOPRESSURE) && !sensor.itemInBase()) { // never detect chair for 5 seconds to exit state
-      speaker.speaker1Stop();
-      speaker.speaker2Stop();
-      cabinLightOnSetUp();
+    if(sensor.chairPressureNotDetected(ENDNOPRESSURE) && sensor.itemInBase()) { // never detect chair for 5 seconds to exit state
+      light.baseOff(); // turn off the base light
+      cabinLightOnSetUp(); // go to light on state
     }
     else if(sensor.chairPressureDetected(ENDPRESSUREDETECTED)) { // has been sitting for the pass 1 minute, continue with meditation.
       meditationSetUp();
     }
   }
 
-  light.baseLighting(sensor.itemInBase());
+  light.baseLighting(sensor.itemInBase()); // once item in base, base will turn off
 }
 
 
