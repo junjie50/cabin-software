@@ -90,12 +90,21 @@ void Fsm::endState() {
   return;
 }
 
-bool compareString(char *s1, char *s2) {
-  int minLength = min(strlen(s1), strlen(s2));
-  for(int i = 0; i < minLength; i++) {
-    if(s1[i] != s2[i]) {
+bool compareString(char *s2, char *s1) {
+  int l1 = strlen(s1);
+  int l2 = strlen(s2);
+  int p1 = 0;
+  int p2 = 0;
+  while(p1 < l1) {
+    while(p2 < l2 && s2[p2] != s1[p1]){
+      p2++;
+    }
+
+    if(p2 == l2) {
       return false;
     }
+    p1 += 1;
+    p2 += 1;
   }
   return true;
 }

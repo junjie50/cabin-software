@@ -43,6 +43,7 @@ class Fsm {
     bool idle = true;
     unsigned long currTime;
     int msgCount = 0;
+    unsigned long prevSend = 0;
 
     // meditationFlowCheckState
     bool meditationFlowCheck = false;

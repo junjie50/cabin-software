@@ -118,7 +118,7 @@ bool Sensor::heartBeatPoll() {
 
   unsigned long timeDiff = currTime - detectTime;
   if(hbreading > validLow && hbreading < validHigh) { // valid reading
-    if(timeDiff > 60000) { // start of a new detection, set values for calibration
+    if(timeDiff > 10000) { // start of a new detection, set values for calibration
       low = 2000;
       high = 0;
       startTime = currTime;
@@ -138,7 +138,7 @@ bool Sensor::heartBeatPoll() {
           high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = ((high + low)) / 2 + 3;
+          highThreshold = ((high + low)) / 2 + 2;
           stable = true;
         }
         else if(timeDiff > 400 && hbreading > highThreshold) { // not in pulse mode

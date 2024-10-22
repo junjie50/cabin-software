@@ -33,6 +33,7 @@ class Sensor {
     
     unsigned long prevRecorded = 0;
     unsigned long noHBTime = 0;
+    bool firstTime = true;
 
     // acclerometer
     bool motion = false;

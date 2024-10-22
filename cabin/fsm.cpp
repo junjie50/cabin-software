@@ -12,13 +12,18 @@ void Fsm::resetStates() {
 void Fsm::idleSetUp() {
   Serial.println("idle");
   resetStates();
-  char msg[4] = "s1\n";
-  orb.sendMessage(msg);
   idle = true;
   msgCount = 0;
 }
 
 void Fsm::idleState() {
+  // repeat blueooth state change message
+  unsigned long diff = currTime - prevSend;
+  if(msgCount < 3 && diff > 300) {
+    orb.sendMessage("s1\n");
+    prevSend = currTime;
+    msgCount++;
+  }
   // idle state lighting system
   light.idleLighting();
   
@@ -29,20 +34,12 @@ void Fsm::idleState() {
     meditationFlowCheckSetUp();
   }
 
-
-  // repeat blueooth state change message
-  if(msgCount < 2) {
-    orb.sendMessage("s1\n");
-    msgCount++;
-  }
 }
 
 
 void Fsm::cabinLightOnSetUp() {
   Serial.println("light on");
   resetStates();
-  char msg[4] = "s2\n";
-  orb.sendMessage(msg);
   cabinLightOn = true;
   cabinLightOnStartTime = currTime;
   msgCount = 0;
@@ -50,6 +47,12 @@ void Fsm::cabinLightOnSetUp() {
 
 // cabinLightOnState
 void Fsm::cabinLightOnState() {
+  unsigned long diff = currTime - prevSend;
+  if(msgCount < 3 && diff > 300) {
+    orb.sendMessage("s2\n");
+    prevSend = currTime;
+    msgCount++;
+  }
   // cabinLightOn Lighting
   light.cabinLighting();
 
@@ -68,11 +71,6 @@ void Fsm::cabinLightOnState() {
     meditationFlowCheckSetUp();
   }
 
-  // repeat blueooth state change message
-  if(msgCount < 2) {
-    orb.sendMessage("s2\n");
-    msgCount++;
-  }
 }
 
 
@@ -82,14 +80,19 @@ void Fsm::cabinLightOnState() {
 void Fsm::meditationFlowCheckSetUp() {
   Serial.println("meditation flow");
   resetStates();
-  char msg[4] = "s3\n";
-  orb.sendMessage(msg);
   light.meditationFlowCheckLighting(true);
   meditationFlowCheck = true;
   msgCount = 0;
 }
 
 void Fsm::meditationFlowCheckState() {
+  unsigned long diff = currTime - prevSend;
+  if(msgCount < 3 && diff > 300) {
+    orb.sendMessage("s3\n");
+    prevSend = currTime;
+    msgCount++;
+  }
+
   light.meditationFlowCheckLighting(false);
 
   if(sensor.chairPressureNotDetected(CHAIRNOTDETECTTIME)) {
@@ -101,12 +104,6 @@ void Fsm::meditationFlowCheckState() {
     meditationSetUp();
   }
 
-
-    // repeat blueooth state change message
-  if(msgCount < 2) {
-    orb.sendMessage("s3\n");
-    msgCount++;
-  }
 }
 
 
@@ -118,8 +115,6 @@ void Fsm::meditationFlowCheckState() {
 
 void Fsm::meditationSetUp() {
   resetStates();
-  char msg[4] = "s4\n";
-  orb.sendMessage(msg);
   speaker.meditationSpeaker();
   meditationStart  = currTime;
   diffuserStartTime = currTime;
@@ -139,6 +134,12 @@ void Fsm::meditationExit() {
 }
 
 void Fsm::meditationState() {
+  unsigned long diffMsg = currTime - prevSend;
+  if(msgCount < 3 && diffMsg > 300) {
+    orb.sendMessage("s4\n");
+    prevSend = currTime;
+    msgCount++;
+  }
   static unsigned long duration = 30000;
   // state with ligting system according to the heartbeat that is recorded every second
   unsigned long diff = currTime - meditationStart;
@@ -181,12 +182,6 @@ void Fsm::meditationState() {
       speaker.fidgetStateSpeaker(fidgetStartTime); // change the volume
     }
   }
-
-      // repeat blueooth state change message
-  if(msgCount < 2) {
-    orb.sendMessage("s4\n");
-    msgCount++;
-  }
 }
 
 
@@ -199,8 +194,6 @@ void Fsm::endSetUp() {
   Serial.println("end");
   endStart = currTime;
   resetStates();
-  char msg[4] = "s5\n";
-  orb.sendMessage(msg);
   end = true;
   msgCount = 0;
 }
@@ -208,6 +201,12 @@ void Fsm::endSetUp() {
 void Fsm::endState() {
   static unsigned long duration = 30000;
   static unsigned long timeToLeave = 10000;
+  unsigned long diff = currTime - prevSend;
+  if(msgCount < 3 && diff > 300) {
+    orb.sendMessage("s5\n");
+    prevSend = currTime;
+    msgCount++;
+  }
   light.endLighting();
   unsigned long timeDiff = currTime - endStart;
   if(timeDiff > timeToLeave) { // give people time to react
