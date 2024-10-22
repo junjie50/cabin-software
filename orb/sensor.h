@@ -13,6 +13,7 @@ class Sensor {
     void setUp();
     void reset();
     void polling(Cabin cabin);
+    bool isCalibrating();
 
     // HEART BEAT SENSOR OPERATIONS
     bool heartBeat();
@@ -34,6 +35,7 @@ class Sensor {
     unsigned long prevRecorded = 0;
     unsigned long noHBTime = 0;
     bool firstTime = true;
+    bool calibrating = false;
 
     // acclerometer
     bool motion = false;
