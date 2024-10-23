@@ -169,12 +169,12 @@ void Fsm::meditationState() {
       if(sensor.fidgetDetected(FIDGETDETECTTIME)) {
         fidget = true;
         fidgetStartTime = currTime;
-        Serial.println("speaker started");
+        Serial.println("Fidget speaker");
         speaker.fidgetSpeakerStart();
       }
     }
-    else if(sensor.fidgetNotDetected(FIDGETDETECTTIME)) {
-      Serial.println("fidget stopped");
+    else if(sensor.fidgetNotDetected(FIDGETNOTDETECTTIME)) {
+      Serial.println("Fidget stopped");
       fidget = false;
       speaker.speaker2Stop();
     }

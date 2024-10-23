@@ -63,7 +63,6 @@ class Fsm {
     bool end = false;
     unsigned long endStart;
 
-
     // diffuser
     bool diffuserStart = false;
     unsigned long diffuserStartTime;
