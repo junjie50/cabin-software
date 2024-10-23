@@ -4,7 +4,7 @@ void Sensor::polling(Orb &orb) {
   static unsigned long prevSecond = 0;
   static unsigned long prevHundred = 0;
   unsigned long currSecond= (millis()/SECOND);
-  unsigned long currHundred= (millis()/100);
+  unsigned long currHundred= (millis()/200);
   unsigned long currTime = millis();
   // process data transmission from slave controller
   orb.receiveMessage();
@@ -53,7 +53,7 @@ void Sensor::polling(Orb &orb) {
 
   if(prevHundred != currHundred) {
     currHundred = prevHundred;
-    if((currTime - prevFidget) < 110) {
+    if((currTime - prevFidget) < 210) {
       fidgetTime++;
       noFidgetTime = 0;
     }
