@@ -116,7 +116,7 @@ bool Sensor::heartBeatPoll() {
   static unsigned int low = 2000;
   static unsigned int high = 0;
   static unsigned long monitorTime;
-  static int validHigh = 871;
+  static int validHigh = 890;
   static int validLow = 850;
   static int calibrationCount = 0;
 
@@ -124,17 +124,11 @@ bool Sensor::heartBeatPoll() {
   int hbreading = analogRead(HEARTRATESENSOR);
 
   unsigned long timeDiff = currTime - detectTime;
-  if(timeDiff < 2500) { // set the calibratng variable
-    calibrating = true;
-  }
-  else {
-    calibrating = false;
-  }
 
   if(hbreading > validLow && hbreading < validHigh) { // valid reading
     if(timeDiff > 30000 || firstTime) { // start of a new detection, set values for calibration
       low = 2000;
-      high = validHigh;
+      high = 0;
       startTime = currTime;
       detectTime = currTime;
       stable = false;
@@ -147,12 +141,20 @@ bool Sensor::heartBeatPoll() {
         Serial.println("calibrating");
         calibrationCount += 1;
       }
-      if(timeDiffStart > 2000) { // only allow after 500ms to improve the timing
-        if(timeDiffStart <= 2500) { // do the min and high calibration
+      if(timeDiff < 2000) { // set the calibratng variable
+        calibrating = true;
+      }
+      else {
+        calibrating = false;
+      }
+
+      if(timeDiffStart > 1000) { // only allow after 500ms to improve the timing
+        if(timeDiffStart <= 2000) { // do the min and high calibration
           low = min(low, hbreading);
+          high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = (high + low + 1) / 2 + 1;
+          highThreshold = 869;
           stable = true;
         }
         else if(timeDiff > 450 && hbreading > highThreshold) { // not in pulse mode
@@ -162,7 +164,7 @@ bool Sensor::heartBeatPoll() {
         }
         else { // change pulse to false if prev was pulse or timeDiff < 300;
           pulse = false;
-        } 
+        }
       }
     }
   }
