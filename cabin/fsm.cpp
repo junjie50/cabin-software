@@ -221,7 +221,7 @@ void Fsm::endState() {
   }
 
   light.baseLighting(sensor.itemInBase()); // once item in base, base will turn off
-        // repeat blueooth state change message
+  // repeat blueooth state change message
   if(msgCount < 2) {
     orb.sendMessage("s5\n");
     msgCount++;

@@ -91,6 +91,7 @@ void Fsm::endState() {
   return;
 }
 
+// special compare function incase bluetooth noise
 bool compareString(char *s2, char *s1) {
   int l1 = strlen(s1);
   int l2 = strlen(s2);
@@ -115,7 +116,6 @@ void Fsm::stateChange() {
   cabin.receiveMessage();
   if(cabin.messageReady()) {
     cabin.copyAndClearMessage(buffer);
-    Serial.println(buffer);
     if(compareString(buffer, "s1")) {
       idleSetUp();
       Serial.println("idle");

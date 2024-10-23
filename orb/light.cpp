@@ -1,5 +1,4 @@
 #include "light.h"
-#define LIGHTBLUE 0x3333ff
 
 // Each section lights up by turn and dimming
 void Light::idleLightingSetup(){
@@ -12,10 +11,9 @@ void Light::cabinLightingSetup() {
   FastLED.clear(true);
 }
 
-
-// light blue rgb(173, 216, 230)
+//Setup for meditation flow light
 void Light::meditationFlowCheckLightingSetup() {
-  setColour(LIGHTBLUE);
+  setColour(MEDITATIONFLOWLIGHT);
 }
 
 void Light::meditationFlowCheckLighting(bool movement) {
@@ -37,7 +35,7 @@ void Light::meditationFlowCheckLighting(bool movement) {
 */
 // green light
 void Light::meditationLightingSetup() {
-  setColour(0x33ff33);
+  setColour(MEDITATIONLIGHT);
 }
 
 void Light::meditationLighting(bool heartbeat) {
@@ -67,7 +65,7 @@ void Light::beatOnce(bool heartBeat) {
   unsigned long time = millis();
   unsigned long diff = (time - startTime);
   if(heartBeat && diff > BEATINTERVAL) {
-    setColour(0x33ff33);
+    setColour(MEDITATIONLIGHT);
     startTime = time;
   }
 
@@ -75,7 +73,7 @@ void Light::beatOnce(bool heartBeat) {
   if(diff > BEATINTERVAL) {
     if(diff > 2000) {
       brightness = MAXBRIGHTNESS;
-      setColour(0xff3333);
+      setColour(MEDITATIONLIGHTNOHB);
     }
     else {
       brightness = 0;

@@ -52,7 +52,7 @@ void Sensor::polling(Orb &orb) {
   }
 
   if(prevHundred != currHundred) {
-    currHundred = prevHundred;
+    prevHundred = currHundred;
     if((currTime - prevFidget) < 210) {
       fidgetTime++;
       noFidgetTime = 0;

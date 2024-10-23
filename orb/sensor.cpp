@@ -3,18 +3,15 @@
 void Sensor:: setUp(){
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
-    while (1) {
-      delay(10);
-    }
   }
   Serial.println("MPU6050 Found!");
 
-  //setup motion detection
-  mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
-  mpu.setMotionDetectionThreshold(3);
-  mpu.setMotionDetectionDuration(30);
-  mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn off when reinitialized.
+  //setup motion detectio off when reinitialized.
   mpu.setInterruptPinPolarity(true);
+  mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
+  mpu.setMotionDetectionThreshold(MOTIONTHRESHOLD);
+  mpu.setMotionDetectionDuration(MOTIONDETECTDURATION);
+  mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn
   mpu.setMotionInterrupt(true);
 
   pinMode(BUZZERPIN,OUTPUT);    // Set the digital pin(9) as output
@@ -116,8 +113,8 @@ bool Sensor::heartBeatPoll() {
   static unsigned int low = 2000;
   static unsigned int high = 0;
   static unsigned long monitorTime;
-  static int validHigh = 890;
-  static int validLow = 850;
+  static int validHigh = VALIDHIGH;
+  static int validLow = VALIDLOW;
   static int calibrationCount = 0;
 
   unsigned long currTime = millis();
@@ -126,7 +123,7 @@ bool Sensor::heartBeatPoll() {
   unsigned long timeDiff = currTime - detectTime;
 
   if(hbreading > validLow && hbreading < validHigh) { // valid reading
-    if(timeDiff > 30000 || firstTime) { // start of a new detection, set values for calibration
+    if(timeDiff > RECALIBRATIONINTERVAL || firstTime) { // start of a new detection, set values for calibration
       low = 2000;
       high = 0;
       startTime = currTime;
@@ -154,12 +151,11 @@ bool Sensor::heartBeatPoll() {
           high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = 869;
+          highThreshold = HRTHRESHOLD;
           stable = true;
         }
-        else if(timeDiff > 450 && hbreading > highThreshold) { // not in pulse mode
+        else if(timeDiff > HRMININTERVAL && hbreading > highThreshold) { // not in pulse mode
           detectTime = currTime;
-          Serial.println("b");
           pulse = true;
         }
         else { // change pulse to false if prev was pulse or timeDiff < 300;
