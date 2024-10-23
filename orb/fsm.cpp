@@ -76,6 +76,7 @@ void Fsm::meditationState() {
 
 
 
+
 void Fsm::endSetUp() {
   resetStates();
   end = true;

@@ -12,7 +12,7 @@ void Sensor:: setUp(){
   //setup motion detection
   mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
   mpu.setMotionDetectionThreshold(3);
-  mpu.setMotionDetectionDuration(20);
+  mpu.setMotionDetectionDuration(30);
   mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn off when reinitialized.
   mpu.setInterruptPinPolarity(true);
   mpu.setMotionInterrupt(true);
@@ -22,6 +22,7 @@ void Sensor:: setUp(){
 
 void Sensor::polling(Cabin cabin) {
   static unsigned long prevSecond = 0;
+  static unsigned long prevHundred = 0;
   static unsigned long prevHB = 0;
   static bool prevValid = false;
   static unsigned long prevPoll = 0;
@@ -29,6 +30,7 @@ void Sensor::polling(Cabin cabin) {
   unsigned long currTimeMilli = millis();
   // curr time in seconds
   unsigned long currTime = currTimeMilli / SECOND;
+  unsigned long currTimeHundred= currTimeMilli / 100;
 
   // diff in time from the prev poll
   unsigned long diff = currTimeMilli- prevPoll;
@@ -61,8 +63,8 @@ void Sensor::polling(Cabin cabin) {
   // motion in this cycle default to false
   motion = false;
   // every second update from gyro
-  if(currTime != prevSecond) {
-    prevSecond = currTime;
+  if(currTimeHundred != prevHundred) {
+    prevHundred = currTimeHundred;
     if(mpu.getMotionInterruptStatus()) {
       // if it is true, return true for this cycle
       motion = true;
@@ -76,11 +78,13 @@ void Sensor::reset() {
 }
 
 void Sensor::triggerBuzzer(bool heartbeat){
-  if(calibrating) {
-    return;
-  }
   static unsigned long prevHeartBeat = 0;
   unsigned long currTime = millis();
+
+  if(calibrating) {
+    analogWrite(BUZZERPIN, LOW);
+    return;
+  }
 
   if(heartbeat) {
     prevHeartBeat = currTime;
@@ -128,9 +132,9 @@ bool Sensor::heartBeatPoll() {
   }
 
   if(hbreading > validLow && hbreading < validHigh) { // valid reading
-    if(timeDiff > 10000 || firstTime) { // start of a new detection, set values for calibration
+    if(timeDiff > 30000 || firstTime) { // start of a new detection, set values for calibration
       low = 2000;
-      high = 0;
+      high = validHigh;
       startTime = currTime;
       detectTime = currTime;
       stable = false;
@@ -146,14 +150,14 @@ bool Sensor::heartBeatPoll() {
       if(timeDiffStart > 2000) { // only allow after 500ms to improve the timing
         if(timeDiffStart <= 2500) { // do the min and high calibration
           low = min(low, hbreading);
-          high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = ((high + low + 1)) / 2 + 2;
+          highThreshold = ((high + low)) / 2 + 1;
           stable = true;
         }
         else if(timeDiff > 450 && hbreading > highThreshold) { // not in pulse mode
           detectTime = currTime;
+          Serial.println("b");
           pulse = true;
         }
         else { // change pulse to false if prev was pulse or timeDiff < 300;

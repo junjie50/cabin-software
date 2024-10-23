@@ -2,7 +2,9 @@
 
 void Sensor::polling(Orb &orb) {
   static unsigned long prevSecond = 0;
+  static unsigned long prevHundred = 0;
   unsigned long currSecond= (millis()/SECOND);
+  unsigned long currHundred= (millis()/100);
   unsigned long currTime = millis();
   // process data transmission from slave controller
   orb.receiveMessage();
@@ -47,8 +49,11 @@ void Sensor::polling(Orb &orb) {
       chairNoPressureTime++;
       chairPressureTime = 0;
     }
+  }
 
-    if((currTime - prevFidget) < 1100) {
+  if(prevHundred != currHundred) {
+    currHundred = prevHundred;
+    if((currTime - prevFidget) < 110) {
       fidgetTime++;
       noFidgetTime = 0;
     }
@@ -80,7 +85,7 @@ bool Sensor::heartBeatNotDetected(int time) {
 }
 
 bool Sensor::fidgetDetected(int time) {
-  return fidgetTime >= time;
+  return fidgetTime >= time ;
 }
 
 bool Sensor::fidgetNotDetected(int time) {
