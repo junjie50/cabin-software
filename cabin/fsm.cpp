@@ -19,7 +19,7 @@ void Fsm::idleSetUp() {
 void Fsm::idleState() {
   // repeat blueooth state change message
   unsigned long diff = currTime - prevSend;
-  if(msgCount < 3 && diff > 300) {
+  if(msgCount < REPEATMSG && diff > MSGINTERVAL) {
     orb.sendMessage("s1\n");
     prevSend = currTime;
     msgCount++;
@@ -48,7 +48,7 @@ void Fsm::cabinLightOnSetUp() {
 // cabinLightOnState
 void Fsm::cabinLightOnState() {
   unsigned long diff = currTime - prevSend;
-  if(msgCount < 3 && diff > 300) {
+  if(msgCount < REPEATMSG && diff > MSGINTERVAL) {
     orb.sendMessage("s2\n");
     prevSend = currTime;
     msgCount++;
@@ -56,11 +56,12 @@ void Fsm::cabinLightOnState() {
   // cabinLightOn Lighting
   light.cabinLighting();
 
-  int seconds = (currTime - cabinLightOnStartTime) / SECOND;
 
-  if(sensor.cabinMotionDetected()) {
+  if(sensor.cabinMotionDetected()) { // if motion detected, restart trigger time
     cabinLightOnStartTime = currTime;
   }
+
+  int seconds = (currTime - cabinLightOnStartTime) / SECOND;
 
   // Change in state, if not remain the same
   if(seconds >= CABINLIGHTINTERVAL) {
@@ -87,7 +88,7 @@ void Fsm::meditationFlowCheckSetUp() {
 
 void Fsm::meditationFlowCheckState() {
   unsigned long diff = currTime - prevSend;
-  if(msgCount < 3 && diff > 300) {
+  if(msgCount < REPEATMSG && diff > MSGINTERVAL) {
     orb.sendMessage("s3\n");
     prevSend = currTime;
     msgCount++;
@@ -135,12 +136,12 @@ void Fsm::meditationExit() {
 
 void Fsm::meditationState() {
   unsigned long diffMsg = currTime - prevSend;
-  if(msgCount < 3 && diffMsg > 300) {
+  if(msgCount < REPEATMSG && diffMsg > MSGINTERVAL) {
     orb.sendMessage("s4\n");
     prevSend = currTime;
     msgCount++;
   }
-  static unsigned long duration = 30000;
+
   // state with ligting system according to the heartbeat that is recorded every second
   unsigned long diff = currTime - meditationStart;
   light.meditationLighting(sensor.getHeartBeat());
@@ -150,7 +151,7 @@ void Fsm::meditationState() {
     meditationExit();
     cabinLightOnSetUp();
   }
-  else if(diff > duration) { // go to end state
+  else if(diff > MEDITATIONDURATION) { // go to end state
     meditationExit();
     endSetUp();
   }
@@ -199,14 +200,14 @@ void Fsm::endSetUp() {
 }
 
 void Fsm::endState() {
-  static unsigned long duration = 30000;
-  static unsigned long timeToLeave = 10000;
+  static unsigned long timeToLeave = TIMETOLEAVE;
   unsigned long diff = currTime - prevSend;
-  if(msgCount < 3 && diff > 300) {
+  if(msgCount < REPEATMSG && diff > MSGINTERVAL) {
     orb.sendMessage("s5\n");
     prevSend = currTime;
     msgCount++;
   }
+
   light.endLighting();
   unsigned long timeDiff = currTime - endStart;
   if(timeDiff > timeToLeave) { // give people time to react
@@ -221,11 +222,6 @@ void Fsm::endState() {
   }
 
   light.baseLighting(sensor.itemInBase()); // once item in base, base will turn off
-  // repeat blueooth state change message
-  if(msgCount < 2) {
-    orb.sendMessage("s5\n");
-    msgCount++;
-  }
 }
 
 
@@ -253,8 +249,6 @@ void Fsm::realtime() {
   }
 }
 
-int count = 0;
-char buf[256];
 // main loop
 void Fsm::mainloop() {
   currTime = millis(); // system clock

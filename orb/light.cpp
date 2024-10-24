@@ -18,7 +18,7 @@ void Light::meditationFlowCheckLightingSetup() {
 
 void Light::meditationFlowCheckLighting(bool movement) {
   if(!movement) {
-    glimmer(MEDITATIONFLOWCHECKSTATEGLIMMER);
+    glimmer(MEDITATIONFLOWCHECKSTATEGLIMMERINTERVAL);
   }
   else {
     setBrightness(MAXBRIGHTNESS);

@@ -3,8 +3,13 @@
 void Sensor::polling(Orb &orb) {
   static unsigned long prevSecond = 0;
   static unsigned long prevHundred = 0;
+  static unsigned long secondCheck = SECOND + 100;
+  static unsigned long hundredCheck = FIDGETCHECKFREQUENCY + 10;
+
   unsigned long currSecond= (millis()/SECOND);
-  unsigned long currHundred= (millis()/200);
+
+  unsigned long currHundred= (millis()/FIDGETCHECKFREQUENCY);
+
   unsigned long currTime = millis();
   // process data transmission from slave controller
   orb.receiveMessage();
@@ -32,7 +37,7 @@ void Sensor::polling(Orb &orb) {
 
   if(currSecond != prevSecond) { // poll every second
     prevSecond = currSecond; // prev second recorded
-    if((currTime - prevBeat) < 1100) {
+    if((currTime - prevBeat) < secondCheck) {
       heartBeatTime++;
       noHeartBeatTime = 0;
     }
@@ -53,7 +58,7 @@ void Sensor::polling(Orb &orb) {
 
   if(prevHundred != currHundred) {
     prevHundred = currHundred;
-    if((currTime - prevFidget) < 210) {
+    if((currTime - prevFidget) < hundredCheck) {
       fidgetTime++;
       noFidgetTime = 0;
     }

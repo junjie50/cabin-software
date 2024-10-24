@@ -3,45 +3,38 @@
 void Sensor:: setUp(){
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
   }
   Serial.println("MPU6050 Found!");
 
-  //setup motion detectio off when reinitialized.
-  mpu.setInterruptPinPolarity(true);
+  //setup motion detection
   mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
-  mpu.setMotionDetectionThreshold(MOTIONTHRESHOLD);
-  mpu.setMotionDetectionDuration(MOTIONDETECTDURATION);
-  mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn
+  mpu.setMotionDetectionThreshold(3);
+  mpu.setMotionDetectionDuration(20);
+  mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn off when reinitialized.
+  mpu.setInterruptPinPolarity(true);
   mpu.setMotionInterrupt(true);
 
   pinMode(BUZZERPIN,OUTPUT);    // Set the digital pin(9) as output
+  delay(20);
 }
 
-void Sensor::polling(Cabin cabin) {
+void Sensor::polling() {
   static unsigned long prevSecond = 0;
-  static unsigned long prevHundred = 0;
   static unsigned long prevHB = 0;
-  static bool prevValid = false;
+  static unsigned long prevValid = 0;
   static unsigned long prevPoll = 0;
 
   unsigned long currTimeMilli = millis();
   // curr time in seconds
   unsigned long currTime = currTimeMilli / SECOND;
-  unsigned long currTimeHundred= currTimeMilli / 100;
 
   // diff in time from the prev poll
   unsigned long diff = currTimeMilli- prevPoll;
 
-  // PULSE TRACKER
-  // Poll the heartbeat and store in pulse
-  // pulse will change for every cycle
-  pulse = heartBeatPoll();
-
-  // keep a polling tag for pulse
-  if(pulse) {
-    prevValid = true;
-    prevRecorded = currTime;
-  }
+  bool pulse = heartBeat();
 
   // keep track of prev heartbeat incase of no detection every 100ms
   unsigned long remainHB = millis() / 100;
@@ -49,19 +42,22 @@ void Sensor::polling(Cabin cabin) {
     prevHB = remainHB;
     if(prevValid) {
       noHBTime = 0;
-      prevValid = false; // clear the polling tag for pulse
+      heartbeat = prevValid; // store the prevValid heartbeat
+      prevValid = 0;
     }
     else {
       noHBTime++;
+      if(noHBTime == 50) { // 5s without heartbeat clear heartbeat to 0
+        heartbeat = 0;
+      }
     }
   }
 
-  // MOTION TRACKER
   // motion in this cycle default to false
   motion = false;
   // every second update from gyro
-  if(currTimeHundred != prevHundred) {
-    prevHundred = currTimeHundred;
+  if(currTime != prevSecond) {
+    prevSecond = currTime;
     if(mpu.getMotionInterruptStatus()) {
       // if it is true, return true for this cycle
       motion = true;
@@ -78,17 +74,12 @@ void Sensor::triggerBuzzer(bool heartbeat){
   static unsigned long prevHeartBeat = 0;
   unsigned long currTime = millis();
 
-  if(calibrating) {
-    analogWrite(BUZZERPIN, LOW);
-    return;
-  }
-
   if(heartbeat) {
     prevHeartBeat = currTime;
   }
 
   int diff = currTime - prevHeartBeat;
-  if(diff > BUZZERINTERVAL) {
+  if(diff > 1000) {
     analogWrite(BUZZERPIN, BUZZERPOWER);
   }
   else{
@@ -100,11 +91,11 @@ bool Sensor::controlMoved() {
   return motion;
 }
 
-bool Sensor::heartBeat() {
-  return pulse;
+int Sensor::getHeartBeat() {
+  return heartbeat;
 }
 
-bool Sensor::heartBeatPoll() {
+bool Sensor::heartBeat() {
   static unsigned long detectTime = 0;
   static unsigned long startTime = 0;
   static bool pulse = false;
@@ -113,54 +104,39 @@ bool Sensor::heartBeatPoll() {
   static unsigned int low = 2000;
   static unsigned int high = 0;
   static unsigned long monitorTime;
-  static int validHigh = VALIDHIGH;
-  static int validLow = VALIDLOW;
-  static int calibrationCount = 0;
+  static int validHigh = 870;
+  static int validLow = 850;
 
   unsigned long currTime = millis();
   int hbreading = analogRead(HEARTRATESENSOR);
 
   unsigned long timeDiff = currTime - detectTime;
-
   if(hbreading > validLow && hbreading < validHigh) { // valid reading
-    if(timeDiff > RECALIBRATIONINTERVAL || firstTime) { // start of a new detection, set values for calibration
+    if(timeDiff > 2000) { // start of a new detection, set values for calibration
       low = 2000;
       high = 0;
       startTime = currTime;
       detectTime = currTime;
       stable = false;
-      calibrationCount = 0;
-      firstTime = false;
     }
     else {
       unsigned long timeDiffStart = currTime - startTime;
-      if(calibrationCount == 0) {
-        Serial.println("calibrating");
-        calibrationCount += 1;
-      }
-      if(timeDiff < 2000) { // set the calibratng variable
-        calibrating = true;
-      }
-      else {
-        calibrating = false;
-      }
-
-      if(timeDiffStart > 1000) { // only allow after 1000ms to improve the timing
-        if(timeDiffStart <= 2000) { // do the min and high calibration
+      if(timeDiffStart > 500) { // only allow after 500ms to improve the timing
+        if(timeDiffStart <= 1000) { // do the min and high calibration
           low = min(low, hbreading);
           high = max(high, hbreading);
         }
         else if(!stable) { // calculate new threshold
-          highThreshold = HRTHRESHOLD;
+          highThreshold = (high + low) / 2 + 1;
           stable = true;
         }
-        else if(timeDiff > HRMININTERVAL && hbreading > highThreshold) { // not in pulse mode
+        else if(timeDiff > 250 && hbreading > highThreshold) { // not in pulse mode
           detectTime = currTime;
           pulse = true;
         }
         else { // change pulse to false if prev was pulse or timeDiff < 300;
           pulse = false;
-        }
+        } 
       }
     }
   }
@@ -171,10 +147,8 @@ bool Sensor::heartBeatPoll() {
   return pulse;
 }
 
-bool Sensor::isCalibrating() {
-  return calibrating;
-}
 
 bool Sensor::noHeartBeatFor(int duration) {
-  return (noHBTime / 10) > duration;
+  unsigned long diff = millis() - prevRecorded;
+  return diff > duration;
 }

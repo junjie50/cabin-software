@@ -2,16 +2,15 @@
 
 // Each section lights up by turn and dimming
 void Light::idleLighting() {
-  static unsigned long idleLightInterval = IDLELIGHTINTERVAL;
-  static unsigned long idleLightIntervalHalf = idleLightInterval / 2;
+  static unsigned long idleLightInterval = 4000;
+  static unsigned long idleLightIntervalHalf = 2000;
   static unsigned long time = millis();
   static unsigned long prevRemainder = 0;
   time = millis();
   int currRemainder = time % idleLightInterval;
-
   if(prevRemainder > currRemainder) {
     brightness[idleLight] = 0;
-    idleLight = (idleLight + 1) % NUMBERLIGHT;
+    idleLight = (idleLight + 1) % 4;
   }
   prevRemainder = currRemainder;
 
@@ -27,8 +26,8 @@ void Light::idleLighting() {
 
 // cabin lights turn on
 void Light::cabinLighting() {
-  static unsigned long intervalChair = CHAIRINTERVAL;
-  static unsigned long intervalHalfChair = intervalChair / 2;
+  static unsigned long intervalChair = 1000;
+  static unsigned long intervalHalfChair = 500;
   static unsigned long time;
   time = millis();
   lightAll(MAXLIGHT);
@@ -46,9 +45,11 @@ void Light::cabinLighting() {
 void Light::meditationFlowCheckLighting(bool start) {
   static unsigned long startTime = 0;
   static unsigned long time;
-  static unsigned long interval = TIMETODIM;
-  static unsigned long intervalHalf = interval / 2;
+  static unsigned long interval = 4000;
+  static unsigned long intervalHalf = 2000;
 
+  static unsigned long intervalChair = 1000;
+  static unsigned long intervalHalfChair = 500;
   if(start) {startTime = millis();} 
 
   time = millis();
@@ -66,10 +67,11 @@ void Light::meditationFlowCheckLighting(bool start) {
 
 void Light::meditationLighting(int heartbeat) {
   static unsigned long time = millis();
-  static unsigned int interval = HEARTBEATLIGHTINTERVAL;
-  static unsigned int half = interval / 2;
+  static unsigned int interval = 250;
+  static unsigned int half = 125;
   static unsigned long startTime = 0;
-  static unsigned long defaultInterval = MINUTE/AVGHEARTBEAT;
+  static unsigned long TIMEDIFFLIMIT = 2000;
+  static unsigned long defaultInterval = 60000/AVGHEARTBEAT;
   static unsigned long defaultIntervalHalf = defaultInterval / 2;
   
 
@@ -78,7 +80,7 @@ void Light::meditationLighting(int heartbeat) {
     startTime = currTime;
   }
   unsigned long timeDiff = currTime - startTime;
-  if(timeDiff > interval) { 
+  if(timeDiff > interval) { // if not receiving heart beat for a long time.
     if(timeDiff > TIMEDIFFLIMIT) { // if never receive for too long, go to default human heart beat.
       int remainder = timeDiff % defaultInterval;
       if(remainder > interval) {
@@ -106,7 +108,7 @@ void Light::meditationLighting(int heartbeat) {
 }
 
 void Light::endLighting() {
-  static unsigned long endLightInterval = ENDLIGHTINTERVAL;
+  static unsigned long endLightInterval = 1000;
   static unsigned long time;
   static unsigned long prevRemainder = 0;
 
@@ -187,56 +189,10 @@ void Light::offChair() {
   analogWrite(LIGHTCHAIR, 0);
 }
 
-void Light::baseLighting(bool item) {
-  static unsigned int interval = BASELIGHTINTERVAL;
-  static unsigned int half = interval / 2;
-  setColour(BASECOLOUR);
-  if(!item) {
-    unsigned long time = millis();
-    double remainder = time % interval;
-    if(remainder > half) {
-      remainder = interval - remainder;
-    }
-    int brightness = remainder / (double)half * MAXBRIGHTNESS;
-    setBrightness(brightness);
-  }
-  else {
-    setBrightness(0);
-  }
-  update();
-}
-
-void Light::baseOff() {
-  clearLight();
-}
-
-// Set the brightness of the LED
-void Light::setBrightness(int brightness) {
-  FastLED.setBrightness(brightness);
-}
-
-void Light::clearLight() {
-  FastLED.clear(true);
-}
-
-void Light::setColour(CRGB colour) {
-  fill_solid(leds, NUMLEDS, colour);
-}
-
-void Light::update() {
-  FastLED.show();
-}
-
 void Light::setup() {
   pinMode(LIGHTFRONT, OUTPUT);
   pinMode(LIGHTLEFT, OUTPUT);
   pinMode(LIGHTRIGHT, OUTPUT);
   pinMode(LIGHTBACK, OUTPUT);
-
-  FastLED.addLeds<WS2812, LEDPIN, GRB>(leds, NUMLEDS);
-  setColour(BASECOLOUR);
-  clearLight();
-  update();
 }
-
 

@@ -18,7 +18,7 @@ void Diffuser::trigger(unsigned long startTime, bool start) {
     }
   }
   else {
-    if(interval < 700) { // trigger for 1 second to test
+    if(interval < DIFFUSERINTERVAL) { // trigger for 1 second to test
       digitalWrite(DIFFUSERPIN, HIGH);
     }
     else{
