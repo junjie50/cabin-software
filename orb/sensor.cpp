@@ -79,17 +79,20 @@ void Sensor::triggerBuzzer(bool heartbeat){
   unsigned long currTime = millis();
 
   if(heartbeat) {
-    Serial.println("update");
     prevHeartBeat = currTime;
   }
 
   unsigned long diff = currTime - prevHeartBeat;
   if(diff > BUZZERINTERVAL) {
-    Serial.println("buzzer");
-    analogWrite(BUZZERPIN, BUZZERPOWER);
+    unsigned long second = diff / 1000;
+    if(second % 2 == 1) {
+      analogWrite(BUZZERPIN, BUZZERPOWER);
+    }
+    else {
+      analogWrite(BUZZERPIN, LOW);
+    }
   }
-  else{
-    Serial.println("no buzzer");
+  else {
     analogWrite(BUZZERPIN, LOW);
   }
 }
