@@ -55,6 +55,5 @@ class Fsm {
 
     // end
     bool end = false;
-
 };
 #endif

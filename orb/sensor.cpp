@@ -78,20 +78,18 @@ void Sensor::triggerBuzzer(bool heartbeat){
   static unsigned long prevHeartBeat = 0;
   unsigned long currTime = millis();
 
-  if(calibrating) {
-    analogWrite(BUZZERPIN, LOW);
-    return;
-  }
-
   if(heartbeat) {
+    Serial.println("update");
     prevHeartBeat = currTime;
   }
 
-  int diff = currTime - prevHeartBeat;
+  unsigned long diff = currTime - prevHeartBeat;
   if(diff > BUZZERINTERVAL) {
+    Serial.println("buzzer");
     analogWrite(BUZZERPIN, BUZZERPOWER);
   }
   else{
+    Serial.println("no buzzer");
     analogWrite(BUZZERPIN, LOW);
   }
 }
@@ -134,23 +132,8 @@ bool Sensor::heartBeatPoll() {
     }
     else {
       unsigned long timeDiffStart = currTime - startTime;
-      if(calibrationCount == 0) {
-        Serial.println("calibrating");
-        calibrationCount += 1;
-      }
-      if(timeDiff < 2000) { // set the calibratng variable
-        calibrating = true;
-      }
-      else {
-        calibrating = false;
-      }
-
-      if(timeDiffStart > 1000) { // only allow after 1000ms to improve the timing
-        if(timeDiffStart <= 2000) { // do the min and high calibration
-          low = min(low, hbreading);
-          high = max(high, hbreading);
-        }
-        else if(!stable) { // calculate new threshold
+      if(timeDiffStart > 500) { // only allow after 1000ms to improve the timing
+        if(!stable) { // calculate new threshold
           highThreshold = HRTHRESHOLD;
           stable = true;
         }
